@@ -21,6 +21,22 @@
       display: none;
       z-index: 1000;
     }
+    .legend {
+      position: absolute;
+      bottom: 30px;
+      left: 10px;
+      padding: 10px;
+      background: rgba(255, 255, 255, 0.8);
+      font-size: 0.9em;
+      line-height: 1.2;
+      color: #333;
+      border-radius: 4px;
+    }
+    .legend .scale {
+      height: 10px;
+      background: linear-gradient(to right, rgba(144, 238, 144, 0), rgba(144, 238, 144, 0.5));
+      margin-top: 5px;
+    }
   </style>
 </head>
 <body>
@@ -30,6 +46,11 @@
   </div>
   <div id="loading">Laddar observationer...</div>
   <div id="map"></div>
+  <div class="legend">
+    <strong>Intensitet:</strong>
+    <div class="scale"></div>
+    Låg → Hög
+  </div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
@@ -139,7 +160,8 @@
       L.heatLayer(points, {
         radius: 20,
         blur: 15,
-        maxZoom: 10
+        maxZoom: 10,
+        gradient: { 0.4: 'rgba(144,238,144,0.1)', 0.65: 'rgba(144,238,144,0.3)', 1.0: 'rgba(144,238,144,0.5)' }
       }).addTo(map);
 
       alert(`Följande arter hade observationer (${label}):\n` + [...new Set(foundSpecies)].join("\n"));
@@ -160,4 +182,3 @@
   </footer>
 </body>
 </html>
-<!-- Uppdaterad: Knapp för taxonkey-nedladdning borttagen -->
