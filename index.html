@@ -113,7 +113,7 @@
             foundSpecies.add(name);
           }
           loadingElement.textContent = `Laddar observationer... ${i + 1}/${names.length}`;
-          await delay(100);
+          await delay(200);
         } catch (err) {
           console.warn(`Fel vid hämtning för art: ${name}`);
         }
