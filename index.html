@@ -5,8 +5,9 @@
   <title>Heatmap: Nektarproduktion från GBIF</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet">
   <style>
-    body { margin: 0; font-family: sans-serif; }
+    body { margin: 0; font-family: 'Montserrat', sans-serif; }
     #map { height: 90vh; }
     .controls { padding: 1em; background: #f4f4f4; }
     #loading {
@@ -25,6 +26,7 @@
 <body>
   <div class="controls">
     <button onclick="generateHeatmap()">Visa heatmap för nektarproduktion (GBIF)</button>
+    <button onclick="generateRelevanceHeatmap()">Visa heatmap för biodiversitetsvärde (GBIF)</button>
   </div>
   <div id="loading">Laddar observationer...</div>
   <div id="map"></div>
@@ -130,6 +132,73 @@
     }
 
     window.generateHeatmap = generateHeatmap;
+
+    async function generateRelevanceHeatmap() {
+      const loadingElement = document.getElementById('loading');
+      loadingElement.style.display = 'block';
+
+      const relevanceLookup = await new Promise((resolve, reject) => {
+        Papa.parse(csvURL, {
+          download: true,
+          header: true,
+          complete: results => {
+            const lookup = {};
+            results.data.forEach(row => {
+              const name = row["Scientific name"]?.trim();
+              const relevance = parseFloat(row["Biodiversity relevance"]);
+              if (name && !isNaN(relevance) && relevance > 0) {
+                lookup[name] = relevance;
+              }
+            });
+            resolve(lookup);
+          },
+          error: err => reject(err)
+        });
+      });
+
+      const names = Object.keys(relevanceLookup);
+      loadingElement.textContent = `Laddar observationer... 0/${names.length}`;
+
+      const points = [];
+      const foundSpecies = [];
+
+      for (let i = 0; i < names.length; i++) {
+        const name = names[i];
+        const relevance = relevanceLookup[name];
+        try {
+          const observations = await fetchGBIFObservations(name);
+          let found = false;
+          observations.forEach(obs => {
+            if (obs.decimalLatitude && obs.decimalLongitude) {
+              points.push([obs.decimalLatitude, obs.decimalLongitude, relevance]);
+              found = true;
+            }
+          });
+          if (found) foundSpecies.push(name);
+          loadingElement.textContent = `Laddar observationer... ${i + 1}/${names.length}`;
+          await delay(400);
+        } catch (err) {
+          console.warn(`Fel vid hämtning för art: ${name}`);
+        }
+      }
+
+      loadingElement.style.display = 'none';
+
+      if (points.length === 0) {
+        alert("Inga observationer med biodiversitetsvärde hittades i kartvyn.");
+        return;
+      }
+
+      L.heatLayer(points, {
+        radius: 20,
+        blur: 15,
+        maxZoom: 10
+      }).addTo(map);
+
+      alert("Följande arter hade observationer (biodiversitetsvärde):
+" + foundSpecies.join("
+"));
+    }
   </script>
 </body>
 </html>
