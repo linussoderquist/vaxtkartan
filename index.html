@@ -195,10 +195,13 @@
         maxZoom: 10
       }).addTo(map);
 
-      alert("Följande arter hade observationer (biodiversitetsvärde):
-" + foundSpecies.join("
-"));
+      alert("Följande arter hade observationer (biodiversitetsvärde):\n" + foundSpecies.join("\n"));
     }
   </script>
+  <footer style="padding: 1em; background: #f4f4f4; font-size: 0.9em; text-align: center;">
+    <strong>Källor:</strong>
+    <a href="https://www.gbif.org" target="_blank">gbif.org</a> |
+    <a href="https://doi.org/10.1016/j.ecolind.2020.106923" target="_blank">https://doi.org/10.1016/j.ecolind.2020.106923</a>
+  </footer>
 </body>
 </html>
