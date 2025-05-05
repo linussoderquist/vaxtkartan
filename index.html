@@ -63,7 +63,7 @@
       const relevanceLookup = await loadCSVData();
       const names = Object.keys(relevanceLookup).slice(0, 2); // Begränsa till 2 arter för test
       console.log("Testar med arter:", names);
-      const names = Object.keys(relevanceLookup);
+      const names = Object.keys(relevanceLookup).slice(0, 2); // Begränsa till 2 arter för test
       const allPoints = [];
 
       for (let i = 0; i < names.length; i++) {
@@ -98,3 +98,4 @@
   </script>
 </body>
 </html>
+
