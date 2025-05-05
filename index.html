@@ -9,12 +9,24 @@
     body { margin: 0; font-family: sans-serif; }
     #map { height: 90vh; }
     .controls { padding: 1em; background: #f4f4f4; }
+    #loading {
+      position: absolute;
+      top: 1em;
+      right: 1em;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 0.5em 1em;
+      border-radius: 4px;
+      font-weight: bold;
+      display: none;
+      z-index: 1000;
+    }
   </style>
 </head>
 <body>
   <div class="controls">
     <button onclick="generateHeatmap()">Visa heatmap för SE-klassade arter (GBIF)</button>
   </div>
+  <div id="loading">Laddar observationer...</div>
   <div id="map"></div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -29,6 +41,10 @@
 
     let heatLayer;
     const csvURL = "Riskklassning2024_Uttag.csv";
+
+    function delay(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
 
     async function loadSETaxonNames() {
       return new Promise((resolve, reject) => {
@@ -66,6 +82,7 @@
     }
 
     async function generateHeatmap() {
+      document.getElementById('loading').style.display = 'block';
       const speciesLookup = await loadSETaxonNames();
       const names = Object.keys(speciesLookup);
       const allPoints = [];
@@ -80,6 +97,7 @@
               allPoints.push([obs.decimalLatitude, obs.decimalLongitude, weight]);
             }
           });
+          await delay(400); // vänta 400 ms mellan anrop
         } catch (err) {
           console.warn(`Fel vid hämtning för art: ${name}`);
         }
@@ -91,6 +109,8 @@
         blur: 15,
         maxZoom: 10
       }).addTo(map);
+
+      document.getElementById('loading').style.display = 'none';
 
       if (allPoints.length === 0) alert("Inga SE-observationer hittades i kartvyn.");
     }
