@@ -59,7 +59,10 @@
     }
 
     async function generateHeatmap() {
+      console.log("Startar heatmap-generering...");
       const relevanceLookup = await loadCSVData();
+      const names = Object.keys(relevanceLookup).slice(0, 2); // Begränsa till 2 arter för test
+      console.log("Testar med arter:", names);
       const names = Object.keys(relevanceLookup);
       const allPoints = [];
 
@@ -67,14 +70,13 @@
         const name = names[i];
         const relevance = relevanceLookup[name];
         try {
-          const observations = await fetchGBIFObservations(name);
+          console.log(`Hämtar GBIF-data för: ${name}`);
+        const observations = await fetchGBIFObservations(name);
+        console.log(`Antal observationer för ${name}:`, observations.length);
           observations.forEach(obs => {
             if (obs.decimalLatitude && obs.decimalLongitude) {
-              allPoints.push([
-                obs.decimalLatitude,
-                obs.decimalLongitude,
-                relevance
-              ]);
+              console.log(`Lägger till punkt: (${obs.decimalLatitude}, ${obs.decimalLongitude}) med relevans: ${relevance}`);
+              allPoints.push([obs.decimalLatitude, obs.decimalLongitude, relevance]);
             }
           });
         } catch (err) {
