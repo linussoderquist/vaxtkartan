@@ -2,7 +2,7 @@
 <html lang="sv">
 <head>
   <meta charset="UTF-8">
-  <title>Heatmap: Invasiva arter SE & HI från GBIF</title>
+  <title>Heatmap: SE-klassade arter från Artportalen</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <style>
@@ -13,7 +13,7 @@
 </head>
 <body>
   <div class="controls">
-    <button onclick="generateHeatmap()">Visa heatmap för SE och HI-klassade arter</button>
+    <button onclick="generateHeatmap()">Visa SE-klassade arter (Artportalen)</button>
   </div>
   <div id="map"></div>
 
@@ -28,68 +28,68 @@
     }).addTo(map);
 
     let heatLayer;
+    const riskCSV = "Riskklassning2024_Uttag.csv";
+    const token = "DIN_API_NYCKEL_HÄR"; // <-- byt ut mot din faktiska API-nyckel
 
-    async function loadRiskCSV() {
+    async function loadSETaxonIds() {
       return new Promise((resolve, reject) => {
-        Papa.parse("Riskklassning2024_Uttag.csv", {
+        Papa.parse(riskCSV, {
           download: true,
           header: true,
           complete: results => {
-            const lookup = {};
-            results.data.forEach(row => {
-              const name = row["Vetenskapligt namn (vid riskklassificeringens genomförande)"]?.trim();
-              const klass = row["Riskkategori, utfall enligt GEIAA metodik"]?.trim();
-              if (klass === "SE") lookup[name] = 10;
-              if (klass === "HI") lookup[name] = 5;
-            });
-            resolve(lookup);
+            const ids = results.data
+              .filter(row => row["Riskkategori, utfall enligt GEIAA metodik"]?.trim() === "SE")
+              .map(row => row["TaxonId"]?.trim())
+              .filter(id => id);
+            resolve(ids);
           },
           error: err => reject(err)
         });
       });
     }
 
-    async function fetchGBIFObservations(scientificName) {
-      const bounds = map.getBounds();
-      const wkt = `POLYGON((${bounds.getWest()} ${bounds.getSouth()}, ${bounds.getEast()} ${bounds.getSouth()}, ${bounds.getEast()} ${bounds.getNorth()}, ${bounds.getWest()} ${bounds.getNorth()}, ${bounds.getWest()} ${bounds.getSouth()}))`;
+    async function fetchObservationsForTaxa(taxonIds, bounds) {
       const today = new Date();
       const fromYear = today.getFullYear() - 5;
-      const url = `https://api.gbif.org/v1/occurrence/search?scientificName=${encodeURIComponent(scientificName)}&hasCoordinate=true&geometry=${encodeURIComponent(wkt)}&limit=150&year=${fromYear},${today.getFullYear()}`;
+      const bbox = `${bounds.getWest()},${bounds.getSouth()},${bounds.getEast()},${bounds.getNorth()}`;
 
-      const response = await fetch(url);
-      const data = await response.json();
-      return data.results || [];
+      const url = `https://api.artdatabanken.se/species-observation-system/v1/observations?taxonIds=${taxonIds.join(",")}&bbox=${bbox}&startDate=${fromYear}-01-01&endDate=${today.getFullYear()}-12-31&limit=150`;
+
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Accept': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        console.error('Fel vid hämtning:', response.status, await response.text());
+        return [];
+      }
+
+      return await response.json();
     }
 
     async function generateHeatmap() {
-      const riskLookup = await loadRiskCSV();
-      const names = Object.keys(riskLookup);
-      const allPoints = [];
+      const bounds = map.getBounds();
+      const taxonIds = await loadSETaxonIds();
+      const observations = await fetchObservationsForTaxa(taxonIds, bounds);
 
-      for (let i = 0; i < names.length; i++) {
-        const name = names[i];
-        const weight = riskLookup[name];
-        try {
-          console.log(`GBIF-hämtning: ${name}`);
-          const observations = await fetchGBIFObservations(name);
-          observations.forEach(obs => {
-            if (obs.decimalLatitude && obs.decimalLongitude) {
-              allPoints.push([obs.decimalLatitude, obs.decimalLongitude, weight]);
-            }
-          });
-        } catch (err) {
-          console.warn(`Fel för ${name}`);
-        }
-      }
+      const points = observations.map(obs => [
+        obs.decimalLatitude,
+        obs.decimalLongitude,
+        10 // vikt för SE
+      ]);
 
       if (heatLayer) map.removeLayer(heatLayer);
-      heatLayer = L.heatLayer(allPoints, {
+      heatLayer = L.heatLayer(points, {
         radius: 20,
         blur: 15,
         maxZoom: 10
       }).addTo(map);
 
-      if (allPoints.length === 0) alert("Inga observationer hittades för SE/HI-klassade arter.");
+      if (points.length === 0) alert("Inga SE-observationer hittades i kartvyn.");
     }
 
     window.generateHeatmap = generateHeatmap;
