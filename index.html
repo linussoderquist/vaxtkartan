@@ -82,7 +82,9 @@
     }
 
     async function generateHeatmap() {
-      document.getElementById('loading').style.display = 'block';
+      const loadingElement = document.getElementById('loading');
+      loadingElement.style.display = 'block';
+      loadingElement.textContent = `Laddar observationer... 0/${names.length}`;
       const speciesLookup = await loadSETaxonNames();
       const names = Object.keys(speciesLookup);
       const allPoints = [];
@@ -97,6 +99,7 @@
               allPoints.push([obs.decimalLatitude, obs.decimalLongitude, weight]);
             }
           });
+          loadingElement.textContent = `Laddar observationer... ${i + 1}/${names.length}`;
           await delay(400); // vänta 400 ms mellan anrop
         } catch (err) {
           console.warn(`Fel vid hämtning för art: ${name}`);
