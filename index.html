@@ -59,7 +59,9 @@
       const east = bounds.getEast();
 
       const wkt = `POLYGON((${west} ${south}, ${east} ${south}, ${east} ${north}, ${west} ${north}, ${west} ${south}))`;
-      const url = `https://api.gbif.org/v1/occurrence/search?scientificName=${encodeURIComponent(scientificName)}&hasCoordinate=true&limit=100&geometry=${encodeURIComponent(wkt)}`;
+      const today = new Date();
+      const fiveYearsAgo = new Date(today.getFullYear() - 5, today.getMonth(), today.getDate()).toISOString().split('T')[0];
+      const url = `https://api.gbif.org/v1/occurrence/search?scientificName=${encodeURIComponent(scientificName)}&hasCoordinate=true&geometry=${encodeURIComponent(wkt)}&limit=150&year=${fiveYearsAgo},${today.getFullYear()}`;
 
       const response = await fetch(url);
       const data = await response.json();
@@ -109,6 +111,6 @@
     }
 
     window.generateHeatmap = generateHeatmap;
-  </script>
-</body>
-</html>
+      console.log("Startar heatmap-generering...");
+      const relevanceLookup = await loadCSVData();
+      const names = Object.keys(relevanceLookup);
