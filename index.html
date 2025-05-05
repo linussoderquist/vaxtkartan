@@ -2,7 +2,7 @@
 <html lang="sv">
 <head>
   <meta charset="UTF-8">
-  <title>Karta: Kärlväxtobservationer</title>
+  <title>Karta: Kärlväxtobservationer via GBIF</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <style>
@@ -25,31 +25,51 @@
       attribution: '© OpenStreetMap contributors'
     }).addTo(map);
 
-    let geoLayer;
+    let markerLayer;
 
     async function fetchObservations() {
-      if (geoLayer) {
-        map.removeLayer(geoLayer);
+      if (markerLayer) {
+        map.removeLayer(markerLayer);
       }
 
       const bounds = map.getBounds();
-      const bbox = `${bounds.getSouth()},${bounds.getWest()},${bounds.getNorth()},${bounds.getEast()}`;
+      const gbifBBox = `${bounds.getWest()},${bounds.getSouth()},${bounds.getEast()},${bounds.getNorth()}`;
 
-      const url = `https://artdatabanken.se/api/wfs/marker/v1.0.0?service=WFS&request=GetFeature&typeName=marker:latest_observations&bbox=${bbox}&outputFormat=application/json`;
+      const url = `https://api.gbif.org/v1/occurrence/search?taxon_key=6&hasCoordinate=true&limit=150&geometry=POLYGON((
+        ${bounds.getWest()} ${bounds.getSouth()},
+        ${bounds.getEast()} ${bounds.getSouth()},
+        ${bounds.getEast()} ${bounds.getNorth()},
+        ${bounds.getWest()} ${bounds.getNorth()},
+        ${bounds.getWest()} ${bounds.getSouth()}
+      ))`;
 
       try {
         const response = await fetch(url);
         const data = await response.json();
 
-        geoLayer = L.geoJSON(data, {
-          onEachFeature: function (feature, layer) {
+        const features = data.results.map(obs => {
+          return {
+            type: "Feature",
+            geometry: {
+              type: "Point",
+              coordinates: [obs.decimalLongitude, obs.decimalLatitude]
+            },
+            properties: {
+              name: obs.species || obs.scientificName || "Okänd art",
+              date: obs.eventDate || "okänt datum"
+            }
+          };
+        });
+
+        markerLayer = L.geoJSON({ type: "FeatureCollection", features: features }, {
+          onEachFeature: (feature, layer) => {
             const props = feature.properties;
-            const popupContent = `<strong>${props.vernacularName || 'Okänd art'}</strong><br>Vetenskapligt namn: ${props.scientificName}<br>Datum: ${props.eventDate}`;
-            layer.bindPopup(popupContent);
+            const popup = `<strong>${props.name}</strong><br>Datum: ${props.date}`;
+            layer.bindPopup(popup);
           },
-          pointToLayer: function (feature, latlng) {
+          pointToLayer: (feature, latlng) => {
             return L.circleMarker(latlng, {
-              radius: 6,
+              radius: 5,
               fillColor: '#3388ff',
               color: '#000',
               weight: 1,
@@ -59,12 +79,12 @@
           }
         }).addTo(map);
 
-        if (data.features.length === 0) {
+        if (features.length === 0) {
           alert('Inga observationer hittades i den valda kartvyn.');
         }
       } catch (error) {
         console.error('Fel vid hämtning:', error);
-        alert('Kunde inte hämta data.');
+        alert('Kunde inte hämta data från GBIF.');
       }
     }
   </script>
