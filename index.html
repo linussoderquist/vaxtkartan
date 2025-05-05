@@ -39,7 +39,6 @@
       attribution: '© OpenStreetMap contributors'
     }).addTo(map);
 
-    let heatLayer;
     const csvURL = "Riskklassning2024_Uttag.csv";
 
     function delay(ms) {
@@ -90,6 +89,7 @@
       loadingElement.textContent = `Laddar observationer... 0/${names.length}`;
 
       const overlayMaps = {};
+      const foundSpecies = new Set();
 
       for (let i = 0; i < names.length; i++) {
         const name = names[i];
@@ -110,6 +110,7 @@
             });
             overlayMaps[name] = heat;
             heat.addTo(map);
+            foundSpecies.add(name);
           }
           loadingElement.textContent = `Laddar observationer... ${i + 1}/${names.length}`;
           await delay(400);
@@ -124,11 +125,7 @@
         alert("Inga SE-observationer hittades i kartvyn.");
       } else {
         L.control.layers(null, overlayMaps).addTo(map);
-      }
-    }
-        alert("Följande arter hittades:
-" + Array.from(foundSpecies).join("
-"));
+        alert("Följande arter hittades:\n" + Array.from(foundSpecies).join("\n"));
       }
     }
 
