@@ -68,7 +68,25 @@
       });
     }
 
-    async function fetchGBIFObservationsBatch(namesBatch) {
+    async function getTaxonKeys(names) {
+      const mapping = {};
+      for (const name of names) {
+        const url = `https://api.gbif.org/v1/species/match?name=${encodeURIComponent(name)}`;
+        try {
+          const response = await fetch(url);
+          const data = await response.json();
+          if (data.usageKey) {
+            mapping[data.usageKey] = { taxonKey: data.usageKey, originalName: name };
+          }
+        } catch (err) {
+          console.warn(`TaxonKey-hämtning misslyckades för ${name}`, err);
+        }
+        await delay(100);
+      }
+      return mapping;
+    }
+
+    async function fetchGBIFObservationsBatch(taxonKeys) {
       const bounds = map.getBounds();
       const south = bounds.getSouth();
       const west = bounds.getWest();
@@ -79,7 +97,7 @@
       const fromYear = today.getFullYear() - 5;
 
       const url = new URL("https://api.gbif.org/v1/occurrence/search");
-      namesBatch.forEach(name => url.searchParams.append("scientificName", name));
+      taxonKeys.forEach(k => url.searchParams.append("taxonKey", k));
       url.searchParams.append("hasCoordinate", "true");
       url.searchParams.append("geometry", wkt);
       url.searchParams.append("limit", "300");
@@ -100,35 +118,40 @@
 
       const lookup = await loadCSVColumn(columnName);
       const names = Object.keys(lookup);
-      loadingElement.textContent = `Laddar observationer... 0/${names.length}`;
+      loadingElement.textContent = `Hämtar taxon-nycklar...`;
+
+      const nameToTaxonMap = await getTaxonKeys(names);
+      const taxonKeyToValue = {};
+      const keyToName = {};
+      for (const [key, entry] of Object.entries(nameToTaxonMap)) {
+        taxonKeyToValue[entry.taxonKey] = lookup[entry.originalName];
+        keyToName[entry.taxonKey] = entry.originalName;
+      }
 
       const points = [];
       const foundSpecies = [];
+      const taxonKeys = Object.keys(taxonKeyToValue).map(k => parseInt(k));
 
-      const batchSize = 300;
-      for (let i = 0; i < names.length; i += batchSize) {
-        const batch = names.slice(i, i + batchSize);
+      loadingElement.textContent = `Laddar observationer... 0/${taxonKeys.length}`;
+
+      const batchSize = 20;
+      for (let i = 0; i < taxonKeys.length; i += batchSize) {
+        const batch = taxonKeys.slice(i, i + batchSize);
         try {
           const observations = await fetchGBIFObservationsBatch(batch);
-          const speciesSet = new Set(batch);
-          const foundInBatch = new Set();
 
           observations.forEach(obs => {
-            const speciesName = obs.species || obs.scientificName;
-            if (obs.decimalLatitude && obs.decimalLongitude && speciesName && speciesSet.has(speciesName)) {
-              const value = lookup[speciesName];
-              if (value) {
-                points.push([obs.decimalLatitude, obs.decimalLongitude, value]);
-                foundInBatch.add(speciesName);
-              }
+            if (obs.decimalLatitude && obs.decimalLongitude && obs.taxonKey && taxonKeyToValue[obs.taxonKey]) {
+              const value = taxonKeyToValue[obs.taxonKey];
+              points.push([obs.decimalLatitude, obs.decimalLongitude, value]);
+              foundSpecies.push(keyToName[obs.taxonKey]);
             }
           });
 
-          foundInBatch.forEach(species => foundSpecies.push(species));
-          loadingElement.textContent = `Laddar observationer... ${Math.min(i + batchSize, names.length)}/${names.length}`;
+          loadingElement.textContent = `Laddar observationer... ${Math.min(i + batchSize, taxonKeys.length)}/${taxonKeys.length}`;
           await delay(250);
         } catch (err) {
-          console.warn("Fel vid hämtning för batch", batch, err);
+          console.warn("Fel vid batch-hämtning", batch, err);
         }
       }
 
@@ -145,7 +168,7 @@
         maxZoom: 10
       }).addTo(map);
 
-      alert(`Följande arter hade observationer (${label}):\n` + foundSpecies.join("\n"));
+      alert(`Följande arter hade observationer (${label}):\n` + [...new Set(foundSpecies)].join("\n"));
     }
 
     function generateHeatmap() {
