@@ -84,9 +84,11 @@
     async function generateHeatmap() {
       const loadingElement = document.getElementById('loading');
       loadingElement.style.display = 'block';
-      loadingElement.textContent = `Laddar observationer... 0/${names.length}`;
+
       const speciesLookup = await loadSETaxonNames();
       const names = Object.keys(speciesLookup);
+      loadingElement.textContent = `Laddar observationer... 0/${names.length}`;
+
       const allPoints = [];
 
       for (let i = 0; i < names.length; i++) {
@@ -113,7 +115,7 @@
         maxZoom: 10
       }).addTo(map);
 
-      document.getElementById('loading').style.display = 'none';
+      loadingElement.style.display = 'none';
 
       if (allPoints.length === 0) alert("Inga SE-observationer hittades i kartvyn.");
     }
