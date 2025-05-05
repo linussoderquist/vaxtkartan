@@ -2,7 +2,7 @@
 <html lang="sv">
 <head>
   <meta charset="UTF-8">
-  <title>Heatmap: Biodiversity relevance från GBIF + CSV</title>
+  <title>Heatmap: Invasiva arter SE & HI från GBIF</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <style>
@@ -13,7 +13,7 @@
 </head>
 <body>
   <div class="controls">
-    <button onclick="generateHeatmap()">Hämta artdata från GBIF och visa heatmap</button>
+    <button onclick="generateHeatmap()">Visa heatmap för SE och HI-klassade arter</button>
   </div>
   <div id="map"></div>
 
@@ -28,40 +28,33 @@
     }).addTo(map);
 
     let heatLayer;
-    const csvURL = "vaxtdata.csv";
 
-    async function loadCSVData() {
+    async function loadRiskCSV() {
       return new Promise((resolve, reject) => {
-        Papa.parse(csvURL, {
+        Papa.parse("Riskklassning2024_Uttag.csv", {
           download: true,
           header: true,
-          complete: (results) => {
+          complete: results => {
             const lookup = {};
             results.data.forEach(row => {
-              const name = row["Scientific name"]?.trim();
-              const relevance = parseFloat(row["Biodiversity relevance"]);
-              if (name && !isNaN(relevance)) {
-                lookup[name] = relevance;
-              }
+              const name = row["Vetenskapligt namn (vid riskklassificeringens genomförande)"]?.trim();
+              const klass = row["Riskkategori, utfall enligt GEIAA metodik"]?.trim();
+              if (klass === "SE") lookup[name] = 10;
+              if (klass === "HI") lookup[name] = 5;
             });
             resolve(lookup);
           },
-          error: (err) => reject(err)
+          error: err => reject(err)
         });
       });
     }
 
     async function fetchGBIFObservations(scientificName) {
       const bounds = map.getBounds();
-      const south = bounds.getSouth();
-      const west = bounds.getWest();
-      const north = bounds.getNorth();
-      const east = bounds.getEast();
-
-      const wkt = `POLYGON((${west} ${south}, ${east} ${south}, ${east} ${north}, ${west} ${north}, ${west} ${south}))`;
+      const wkt = `POLYGON((${bounds.getWest()} ${bounds.getSouth()}, ${bounds.getEast()} ${bounds.getSouth()}, ${bounds.getEast()} ${bounds.getNorth()}, ${bounds.getWest()} ${bounds.getNorth()}, ${bounds.getWest()} ${bounds.getSouth()}))`;
       const today = new Date();
-      const fiveYearsAgo = new Date(today.getFullYear() - 5, today.getMonth(), today.getDate()).toISOString().split('T')[0];
-      const url = `https://api.gbif.org/v1/occurrence/search?scientificName=${encodeURIComponent(scientificName)}&hasCoordinate=true&geometry=${encodeURIComponent(wkt)}&limit=150&year=${fiveYearsAgo},${today.getFullYear()}`;
+      const fromYear = today.getFullYear() - 5;
+      const url = `https://api.gbif.org/v1/occurrence/search?scientificName=${encodeURIComponent(scientificName)}&hasCoordinate=true&geometry=${encodeURIComponent(wkt)}&limit=150&year=${fromYear},${today.getFullYear()}`;
 
       const response = await fetch(url);
       const data = await response.json();
@@ -69,32 +62,23 @@
     }
 
     async function generateHeatmap() {
-      console.log("Startar heatmap-generering...");
-      const relevanceLookup = await loadCSVData();
-      const names = Object.keys(relevanceLookup);
-
+      const riskLookup = await loadRiskCSV();
+      const names = Object.keys(riskLookup);
       const allPoints = [];
 
       for (let i = 0; i < names.length; i++) {
         const name = names[i];
-        const relevance = relevanceLookup[name];
+        const weight = riskLookup[name];
         try {
-          console.log(`Hämtar GBIF-data för: ${name}`);
+          console.log(`GBIF-hämtning: ${name}`);
           const observations = await fetchGBIFObservations(name);
-          console.log(`Antal observationer för ${name}:`, observations.length);
-
           observations.forEach(obs => {
             if (obs.decimalLatitude && obs.decimalLongitude) {
-              console.log(`Lägger till punkt: (${obs.decimalLatitude}, ${obs.decimalLongitude}) med relevans: ${relevance}`);
-              allPoints.push([
-                obs.decimalLatitude,
-                obs.decimalLongitude,
-                relevance
-              ]);
+              allPoints.push([obs.decimalLatitude, obs.decimalLongitude, weight]);
             }
           });
         } catch (err) {
-          console.warn(`Kunde inte hämta GBIF-data för ${name}`);
+          console.warn(`Fel för ${name}`);
         }
       }
 
@@ -105,12 +89,10 @@
         maxZoom: 10
       }).addTo(map);
 
-      if (allPoints.length === 0) {
-        alert("Inga observationer matchade CSV-datan.");
-      }
+      if (allPoints.length === 0) alert("Inga observationer hittades för SE/HI-klassade arter.");
     }
 
     window.generateHeatmap = generateHeatmap;
-      console.log("Startar heatmap-generering...");
-      const relevanceLookup = await loadCSVData();
-      const names = Object.keys(relevanceLookup);
+  </script>
+</body>
+</html>
