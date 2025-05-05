@@ -1,245 +1,93 @@
 <!DOCTYPE html>
 <html lang="sv">
 <head>
-  <meta charset="UTF-8">
-  <title>Heatmap: Nektarproduktion från GBIF</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet">
-  <style>
-    body { margin: 0; font-family: 'Montserrat', sans-serif; }
-    #map { height: 90vh; }
-    .controls { padding: 1em; background: #f4f4f4; }
-    #loading {
-      position: absolute;
-      top: 1em;
-      right: 1em;
-      background: rgba(255, 255, 255, 0.9);
-      padding: 0.5em 1em;
-      border-radius: 4px;
-      font-weight: bold;
-      display: none;
-      z-index: 1000;
-    }
-  </style>
+  <meta charset="UTF-8" />
+  <title>TaxonKey Generator</title>
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.2/papaparse.min.js"></script>
 </head>
 <body>
-  <div class="controls">
-    <button onclick="generateHeatmap()">Visa heatmap för nektarproduktion (GBIF)</button>
-    <button onclick="generateRelevanceHeatmap()">Visa heatmap för biodiversitetsvärde (GBIF)</button>
-    <button onclick="downloadTaxonKeyCSV()">Ladda ner vetenskapligt namn + taxonKey</button>
-  </div>
-  <div id="loading">Laddar observationer...</div>
-  <div id="map"></div>
-
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.2/papaparse.min.js"></script>
+  <h1>Generera TaxonKeys från CSV</h1>
+  <input type="file" id="fileInput" accept=".csv" />
+  <button onclick="generateTaxonKeys()">Ladda ner CSV med TaxonKeys</button>
+  <div id="status"></div>
 
   <script>
-    const map = L.map('map').setView([63.0, 15.0], 5);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap contributors'
-    }).addTo(map);
-
-    const csvURL = "vaxtdata.csv";
-
-    function delay(ms) {
+    async function delay(ms) {
       return new Promise(resolve => setTimeout(resolve, ms));
     }
 
-    async function loadCSVColumn(columnName) {
-      return new Promise((resolve, reject) => {
-        Papa.parse(csvURL, {
-          download: true,
-          header: true,
-          complete: results => {
-            const lookup = {};
-            results.data.forEach(row => {
-              const name = row["Scientific name"]?.trim();
-              const value = parseFloat(row[columnName]);
-              if (name && !isNaN(value) && value > 0) {
-                lookup[name] = value;
-              }
-            });
-            resolve(lookup);
-          },
-          error: err => reject(err)
-        });
-      });
-    }
-
-    async function loadScientificNames() {
-      return new Promise((resolve, reject) => {
-        Papa.parse(csvURL, {
-          download: true,
-          header: true,
-          complete: results => {
-            const names = results.data
-              .map(row => row["Scientific name"]?.trim())
-              .filter(name => !!name);
-            resolve([...new Set(names)]);
-          },
-          error: err => reject(err)
-        });
-      });
-    }
-
-    async function getTaxonKeys(names) {
-      const mapping = {};
-      for (const name of names) {
-        const url = `https://api.gbif.org/v1/species/match?name=${encodeURIComponent(name)}`;
-        try {
-          const response = await fetch(url);
-          const data = await response.json();
-          if (data.usageKey) {
-            mapping[data.scientificName || name] = { taxonKey: data.usageKey, originalName: name };
-          }
-        } catch (err) {
-          console.warn(`TaxonKey-hämtning misslyckades för ${name}`, err);
+    async function fetchTaxonKey(name, index) {
+      try {
+        const response = await fetch(`https://api.gbif.org/v1/species/match?name=${encodeURIComponent(name)}`);
+        const data = await response.json();
+        if (data.usageKey) {
+          console.log(`✅ ${index}: ${name} → ${data.usageKey}`);
+          return data.usageKey;
+        } else {
+          console.warn(`⚠️ ${index}: Ingen taxonKey för ${name}`);
+          return "";
         }
-        await delay(100);
+      } catch (err) {
+        console.error(`❌ ${index}: Fel vid hämtning för ${name}`, err);
+        return "";
       }
-      return mapping;
     }
 
-    async function fetchGBIFObservationsBatch(taxonKeys) {
-      const bounds = map.getBounds();
-      const south = bounds.getSouth();
-      const west = bounds.getWest();
-      const north = bounds.getNorth();
-      const east = bounds.getEast();
-      const wkt = `POLYGON((${west} ${south}, ${east} ${south}, ${east} ${north}, ${west} ${north}, ${west} ${south}))`;
-      const today = new Date();
-      const fromYear = today.getFullYear() - 5;
+    async function generateTaxonKeys() {
+      const fileInput = document.getElementById("fileInput");
+      const status = document.getElementById("status");
 
-      const url = new URL("https://api.gbif.org/v1/occurrence/search");
-      taxonKeys.forEach(k => url.searchParams.append("taxonKey", k));
-      url.searchParams.append("hasCoordinate", "true");
-      url.searchParams.append("geometry", wkt);
-      url.searchParams.append("limit", "300");
-      url.searchParams.append("year", `${fromYear},${today.getFullYear()}`);
-
-      const response = await fetch(url);
-      if (!response.ok) {
-        console.warn("Felaktigt svar från GBIF:", response.status);
-        return [];
-      }
-      const data = await response.json();
-      return data.results || [];
-    }
-
-    async function generateGenericHeatmap(columnName, label) {
-      const loadingElement = document.getElementById('loading');
-      loadingElement.style.display = 'block';
-      const lookup = await loadCSVColumn(columnName);
-      const names = Object.keys(lookup);
-      loadingElement.textContent = `Hämtar taxon-nycklar...`;
-
-      const nameToTaxonMap = await getTaxonKeys(names);
-      const taxonKeyToValue = {};
-      const keyToName = {};
-      for (const [_, entry] of Object.entries(nameToTaxonMap)) {
-        taxonKeyToValue[entry.taxonKey] = lookup[entry.originalName];
-        keyToName[entry.taxonKey] = entry.originalName;
-      }
-
-      const points = [];
-      const foundSpecies = [];
-      const taxonKeys = Object.keys(taxonKeyToValue).map(k => parseInt(k));
-
-      loadingElement.textContent = `Laddar observationer... 0/${taxonKeys.length}`;
-
-      const batchSize = 20;
-      for (let i = 0; i < taxonKeys.length; i += batchSize) {
-        const batch = taxonKeys.slice(i, i + batchSize);
-        try {
-          const observations = await fetchGBIFObservationsBatch(batch);
-
-          observations.forEach(obs => {
-            if (obs.decimalLatitude && obs.decimalLongitude && obs.taxonKey && taxonKeyToValue[obs.taxonKey]) {
-              const value = taxonKeyToValue[obs.taxonKey];
-              points.push([obs.decimalLatitude, obs.decimalLongitude, value]);
-              foundSpecies.push(keyToName[obs.taxonKey]);
-            }
-          });
-
-          loadingElement.textContent = `Laddar observationer... ${Math.min(i + batchSize, taxonKeys.length)}/${taxonKeys.length}`;
-          await delay(250);
-        } catch (err) {
-          console.warn("Fel vid batch-hämtning", batch, err);
-        }
-      }
-
-      loadingElement.style.display = 'none';
-
-      if (points.length === 0) {
-        alert(`Inga observationer med ${label} hittades i kartvyn.`);
+      if (!fileInput.files.length) {
+        alert("Välj en CSV-fil först.");
         return;
       }
 
-      L.heatLayer(points, {
-        radius: 20,
-        blur: 15,
-        maxZoom: 10
-      }).addTo(map);
+      status.textContent = "Läser fil...";
 
-      alert(`Följande arter hade observationer (${label}):\n` + [...new Set(foundSpecies)].join("\n"));
+      Papa.parse(fileInput.files[0], {
+        header: true,
+        complete: async function(results) {
+          const data = results.data;
+          const updatedData = [];
+          let success = 0;
+          let fail = 0;
+
+          status.textContent = `Hämtar taxonKeys...`;
+
+          for (let i = 0; i < data.length; i++) {
+            const row = data[i];
+            const name = row["Scientific name"]?.trim();
+            if (!name) continue;
+
+            const taxonKey = await fetchTaxonKey(name, i + 1);
+            row["taxonKey"] = taxonKey;
+            if (taxonKey) success++;
+            else fail++;
+
+            updatedData.push(row);
+            if (i % 10 === 0) status.textContent = `Bearbetat ${i + 1}/${data.length} rader...`;
+
+            await delay(150); // throttling
+          }
+
+          status.textContent = `Klart: ${success} lyckades, ${fail} misslyckades. Skapar fil...`;
+
+          const csv = Papa.unparse(updatedData);
+          const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = "taxonkeys_resultat.csv";
+          a.click();
+
+          status.textContent += " – Fil nedladdad.";
+        },
+        error: function(err) {
+          console.error("Fel vid CSV-läsning", err);
+          status.textContent = "Fel vid filinläsning.";
+        }
+      });
     }
-
-    function generateHeatmap() {
-      generateGenericHeatmap("Nectar production", "nektarproduktion");
-    }
-
-    function generateRelevanceHeatmap() {
-      generateGenericHeatmap("Biodiversity relevance", "biodiversitetsvärde");
-    }
-
-    async function downloadTaxonKeyCSV() {
-      console.log("Knappen tryckt – startar process");
-
-      const loadingElement = document.getElementById('loading');
-      loadingElement.textContent = "Hämtar taxonKeys...";
-      loadingElement.style.display = 'block';
-
-      try {
-        const names = await loadScientificNames();
-        console.log(`Totalt ${names.length} namn att hämta taxonKeys för`);
-
-        const taxonMap = await getTaxonKeys(names);
-        const rows = Object.entries(taxonMap).map(([_, entry]) => ({
-          "Scientific name": entry.originalName,
-          "TaxonKey": entry.taxonKey
-        }));
-
-        const csv = Papa.unparse(rows);
-        const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        link.href = url;
-        link.download = "vaxtdata_taxonkeys.csv";
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        console.log("Fil skapad och nedladdad");
-
-      } catch (err) {
-        console.error("Fel under taxonKey-hämtning:", err);
-        alert("Ett fel uppstod – kontrollera konsolen för mer information.");
-      }
-
-      loadingElement.style.display = 'none';
-    }
-
-    window.addEventListener('unhandledrejection', event => {
-      console.error("Ohanterat fel:", event.reason);
-    });
   </script>
-
-  <footer style="padding: 1em; background: #f4f4f4; font-size: 0.9em; text-align: center;">
-    <strong>Källor:</strong>
-    <a href="https://www.gbif.org" target="_blank">gbif.org</a> |
-    <a href="https://doi.org/10.1016/j.ecolind.2020.106923" target="_blank">https://doi.org/10.1016/j.ecolind.2020.106923</a>
-  </footer>
 </body>
 </html>
