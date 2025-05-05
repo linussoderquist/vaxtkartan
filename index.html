@@ -14,13 +14,11 @@
 </head>
 <body>
   <div class="controls">
-    <label for="taxon">Taxon-ID:</label>
-    <input type="text" id="taxon" placeholder="t.ex. 100225 (Tjäder)">
     <label for="from">Från (YYYY-MM-DD):</label>
-    <input type="date" id="from">
+    <input type="date" id="from" value="2020-01-01">
     <label for="to">Till (YYYY-MM-DD):</label>
     <input type="date" id="to">
-    <button onclick="fetchObservations()">Visa observationer</button>
+    <button onclick="fetchObservations()">Visa kärlväxter</button>
   </div>
   <div id="map"></div>
 
@@ -34,21 +32,24 @@
 
     let markers = [];
 
+    function getCurrentDate() {
+      const today = new Date();
+      return today.toISOString().split('T')[0];
+    }
+
+    document.getElementById('to').value = getCurrentDate();
+
     async function fetchObservations() {
-      // Ta bort gamla markörer
       markers.forEach(m => map.removeLayer(m));
       markers = [];
 
-      const taxon = document.getElementById('taxon').value;
       const from = document.getElementById('from').value;
       const to = document.getElementById('to').value;
 
-      if (!taxon || !from || !to) {
-        alert('Fyll i alla fält.');
-        return;
-      }
+      const bbox = map.getBounds();
+      const bboxStr = `${bbox.getSouth()},${bbox.getWest()},${bbox.getNorth()},${bbox.getEast()}`;
 
-      const url = `https://api.artdatabanken.se/sos/v1/GetObservation?offering=1.1&observedProperty=taxon:${taxon}&eventTime=${from}/${to}`;
+      const url = `https://api.artdatabanken.se/sos/v1/GetObservation?offering=1.1&observedProperty=taxon:1&eventTime=${from}/${to}&spatialFilter=bbox:${bboxStr}&resultCount=150&resultOrderBy=phenomenonTime desc`;
 
       try {
         const response = await fetch(url);
