@@ -2,23 +2,18 @@
 <html lang="sv">
 <head>
   <meta charset="UTF-8">
-  <title>Artobservationer från Artportalen</title>
+  <title>Karta: Kärlväxtobservationer</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <style>
     body { font-family: sans-serif; margin: 0; padding: 0; }
-    #map { height: 80vh; }
+    #map { height: 90vh; }
     .controls { padding: 1em; background: #f4f4f4; }
-    .controls input, .controls button { margin-right: 1em; }
   </style>
 </head>
 <body>
   <div class="controls">
-    <label for="from">Från (YYYY-MM-DD):</label>
-    <input type="date" id="from" value="2020-01-01">
-    <label for="to">Till (YYYY-MM-DD):</label>
-    <input type="date" id="to">
-    <button onclick="fetchObservations()">Visa kärlväxter</button>
+    <button onclick="fetchObservations()">Visa kärlväxter i kartvyn</button>
   </div>
   <div id="map"></div>
 
@@ -30,48 +25,42 @@
       attribution: '© OpenStreetMap contributors'
     }).addTo(map);
 
-    let markers = [];
-
-    function getCurrentDate() {
-      const today = new Date();
-      return today.toISOString().split('T')[0];
-    }
-
-    document.getElementById('to').value = getCurrentDate();
+    let geoLayer;
 
     async function fetchObservations() {
-      markers.forEach(m => map.removeLayer(m));
-      markers = [];
+      if (geoLayer) {
+        map.removeLayer(geoLayer);
+      }
 
-      const from = document.getElementById('from').value;
-      const to = document.getElementById('to').value;
+      const bounds = map.getBounds();
+      const bbox = `${bounds.getSouth()},${bounds.getWest()},${bounds.getNorth()},${bounds.getEast()}`;
 
-      const bbox = map.getBounds();
-      const bboxStr = `${bbox.getSouth()},${bbox.getWest()},${bbox.getNorth()},${bbox.getEast()}`;
-
-      const url = `https://api.artdatabanken.se/sos/v1/GetObservation?offering=1.1&observedProperty=taxon:1&eventTime=${from}/${to}&spatialFilter=bbox:${bboxStr}&resultCount=150&resultOrderBy=phenomenonTime desc`;
+      const url = `https://artdatabanken.se/api/wfs/marker/v1.0.0?service=WFS&request=GetFeature&typeName=marker:latest_observations&bbox=${bbox}&outputFormat=application/json`;
 
       try {
         const response = await fetch(url);
-        const xml = await response.text();
-        const parser = new DOMParser();
-        const xmlDoc = parser.parseFromString(xml, "application/xml");
+        const data = await response.json();
 
-        const results = xmlDoc.querySelectorAll("result");
-
-        results.forEach(result => {
-          const lat = parseFloat(result.querySelector("latitude")?.textContent);
-          const lon = parseFloat(result.querySelector("longitude")?.textContent);
-          const name = result.querySelector("vernacularName")?.textContent || "Okänd art";
-
-          if (!isNaN(lat) && !isNaN(lon)) {
-            const marker = L.marker([lat, lon]).addTo(map).bindPopup(name);
-            markers.push(marker);
+        geoLayer = L.geoJSON(data, {
+          onEachFeature: function (feature, layer) {
+            const props = feature.properties;
+            const popupContent = `<strong>${props.vernacularName || 'Okänd art'}</strong><br>Vetenskapligt namn: ${props.scientificName}<br>Datum: ${props.eventDate}`;
+            layer.bindPopup(popupContent);
+          },
+          pointToLayer: function (feature, latlng) {
+            return L.circleMarker(latlng, {
+              radius: 6,
+              fillColor: '#3388ff',
+              color: '#000',
+              weight: 1,
+              opacity: 1,
+              fillOpacity: 0.6
+            });
           }
-        });
+        }).addTo(map);
 
-        if (results.length === 0) {
-          alert('Inga observationer hittades.');
+        if (data.features.length === 0) {
+          alert('Inga observationer hittades i den valda kartvyn.');
         }
       } catch (error) {
         console.error('Fel vid hämtning:', error);
