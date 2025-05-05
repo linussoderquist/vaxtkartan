@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8">
+  <title>Artobservationer från Artportalen</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    body { font-family: sans-serif; margin: 0; padding: 0; }
+    #map { height: 80vh; }
+    .controls { padding: 1em; background: #f4f4f4; }
+    .controls input, .controls button { margin-right: 1em; }
+  </style>
+</head>
+<body>
+  <div class="controls">
+    <label for="taxon">Taxon-ID:</label>
+    <input type="text" id="taxon" placeholder="t.ex. 100225 (Tjäder)">
+    <label for="from">Från (YYYY-MM-DD):</label>
+    <input type="date" id="from">
+    <label for="to">Till (YYYY-MM-DD):</label>
+    <input type="date" id="to">
+    <button onclick="fetchObservations()">Visa observationer</button>
+  </div>
+  <div id="map"></div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    const map = L.map('map').setView([63.0, 15.0], 5);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    let markers = [];
+
+    async function fetchObservations() {
+      // Ta bort gamla markörer
+      markers.forEach(m => map.removeLayer(m));
+      markers = [];
+
+      const taxon = document.getElementById('taxon').value;
+      const from = document.getElementById('from').value;
+      const to = document.getElementById('to').value;
+
+      if (!taxon || !from || !to) {
+        alert('Fyll i alla fält.');
+        return;
+      }
+
+      const url = `https://api.artdatabanken.se/sos/v1/GetObservation?offering=1.1&observedProperty=taxon:${taxon}&eventTime=${from}/${to}`;
+
+      try {
+        const response = await fetch(url);
+        const xml = await response.text();
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(xml, "application/xml");
+
+        const results = xmlDoc.querySelectorAll("result");
+
+        results.forEach(result => {
+          const lat = parseFloat(result.querySelector("latitude")?.textContent);
+          const lon = parseFloat(result.querySelector("longitude")?.textContent);
+          const name = result.querySelector("vernacularName")?.textContent || "Okänd art";
+
+          if (!isNaN(lat) && !isNaN(lon)) {
+            const marker = L.marker([lat, lon]).addTo(map).bindPopup(name);
+            markers.push(marker);
+          }
+        });
+
+        if (results.length === 0) {
+          alert('Inga observationer hittades.');
+        }
+      } catch (error) {
+        console.error('Fel vid hämtning:', error);
+        alert('Kunde inte hämta data.');
+      }
+    }
+  </script>
+</body>
+</html>
