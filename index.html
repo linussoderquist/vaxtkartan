@@ -89,35 +89,47 @@
       const names = Object.keys(speciesLookup);
       loadingElement.textContent = `Laddar observationer... 0/${names.length}`;
 
-      const allPoints = [];
+      const overlayMaps = {};
 
       for (let i = 0; i < names.length; i++) {
         const name = names[i];
         const weight = speciesLookup[name];
         try {
           const observations = await fetchGBIFObservations(name);
+          const points = [];
           observations.forEach(obs => {
             if (obs.decimalLatitude && obs.decimalLongitude) {
-              allPoints.push([obs.decimalLatitude, obs.decimalLongitude, weight]);
+              points.push([obs.decimalLatitude, obs.decimalLongitude, weight]);
             }
           });
+          if (points.length > 0) {
+            const heat = L.heatLayer(points, {
+              radius: 20,
+              blur: 15,
+              maxZoom: 10
+            });
+            overlayMaps[name] = heat;
+            heat.addTo(map);
+          }
           loadingElement.textContent = `Laddar observationer... ${i + 1}/${names.length}`;
-          await delay(400); // vänta 400 ms mellan anrop
+          await delay(400);
         } catch (err) {
           console.warn(`Fel vid hämtning för art: ${name}`);
         }
       }
 
-      if (heatLayer) map.removeLayer(heatLayer);
-      heatLayer = L.heatLayer(allPoints, {
-        radius: 20,
-        blur: 15,
-        maxZoom: 10
-      }).addTo(map);
-
       loadingElement.style.display = 'none';
 
-      if (allPoints.length === 0) alert("Inga SE-observationer hittades i kartvyn.");
+      if (Object.keys(overlayMaps).length === 0) {
+        alert("Inga SE-observationer hittades i kartvyn.");
+      } else {
+        L.control.layers(null, overlayMaps).addTo(map);
+      }
+    }
+        alert("Följande arter hittades:
+" + Array.from(foundSpecies).join("
+"));
+      }
     }
 
     window.generateHeatmap = generateHeatmap;
