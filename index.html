@@ -27,6 +27,9 @@
   <div class="controls">
     <button onclick="generateHeatmap()">Visa heatmap för nektarproduktion (GBIF)</button>
     <button onclick="generateRelevanceHeatmap()">Visa heatmap för biodiversitetsvärde (GBIF)</button>
+    <input type="file" id="csvInput" accept=".csv">
+    <button onclick="addTaxonKeysToCSV()">Lägg till taxonKey och ladda ner</button>
+    <a id="downloadLink" style="display:none; margin-left: 1em;">Ladda ner uppdaterad CSV</a>
   </div>
   <div id="loading">Laddar observationer...</div>
   <div id="map"></div>
@@ -61,7 +64,6 @@
                 lookup[name] = value;
               }
             });
-            console.log("CSV loaded. Found species:", Object.keys(lookup));
             resolve(lookup);
           },
           error: err => reject(err)
@@ -76,18 +78,14 @@
         try {
           const response = await fetch(url);
           const data = await response.json();
-          console.log("GBIF response for", name, ":", data);
           if (data.usageKey) {
-            mapping[data.usageKey] = { taxonKey: data.usageKey, originalName: name };
-          } else {
-            console.warn("No usageKey found for", name);
+            mapping[data.scientificName || name] = { taxonKey: data.usageKey, originalName: name };
           }
         } catch (err) {
-          console.error(`TaxonKey error for ${name}:`, err);
+          console.warn(`TaxonKey-hämtning misslyckades för ${name}`, err);
         }
         await delay(100);
       }
-      console.log("TaxonKey mapping completed:", mapping);
       return mapping;
     }
 
@@ -123,12 +121,6 @@
 
       const lookup = await loadCSVColumn(columnName);
       const names = Object.keys(lookup);
-      if (names.length === 0) {
-        alert("Inga arter hittades i CSV-filen för kolumn: " + columnName);
-        loadingElement.style.display = 'none';
-        return;
-      }
-
       loadingElement.textContent = `Hämtar taxon-nycklar...`;
 
       const nameToTaxonMap = await getTaxonKeys(names);
@@ -189,7 +181,51 @@
     function generateRelevanceHeatmap() {
       generateGenericHeatmap("Biodiversity relevance", "biodiversitetsvärde");
     }
+
+    async function fetchTaxonKey(name) {
+      const url = `https://api.gbif.org/v1/species/match?name=${encodeURIComponent(name)}`;
+      try {
+        const res = await fetch(url);
+        const data = await res.json();
+        return data.usageKey || "";
+      } catch {
+        return "";
+      }
+    }
+
+    async function addTaxonKeysToCSV() {
+      const fileInput = document.getElementById('csvInput');
+      if (!fileInput.files.length) {
+        alert("Vänligen välj en CSV-fil först.");
+        return;
+      }
+
+      const file = fileInput.files[0];
+      Papa.parse(file, {
+        header: true,
+        complete: async function(results) {
+          const updatedData = [];
+          const header = [...results.meta.fields, "taxonKey"];
+          for (const row of results.data) {
+            const name = row["Scientific name"];
+            const key = name ? await fetchTaxonKey(name.trim()) : "";
+            updatedData.push({...row, taxonKey: key});
+            await delay(100);
+          }
+
+          const csv = Papa.unparse({fields: header, data: updatedData});
+          const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+          const url = URL.createObjectURL(blob);
+          const link = document.getElementById('downloadLink');
+          link.setAttribute('href', url);
+          link.setAttribute('download', 'uppdaterad_vaxtdata.csv');
+          link.style.display = 'inline';
+          link.textContent = "Ladda ner uppdaterad CSV";
+        }
+      });
+    }
   </script>
+
   <footer style="padding: 1em; background: #f4f4f4; font-size: 0.9em; text-align: center;">
     <strong>Källor:</strong>
     <a href="https://www.gbif.org" target="_blank">gbif.org</a> |
