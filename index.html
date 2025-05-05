@@ -69,46 +69,6 @@
     async function generateHeatmap() {
       console.log("Startar heatmap-generering...");
       const relevanceLookup = await loadCSVData();
-      const names = Object.keys(relevanceLookup).slice(0, 2); // Begränsa till 2 arter för test
-      console.log("Testar med arter:", names);
+      const names = Object.keys(relevanceLookup);
 
-      const allPoints = [];
-
-      for (let i = 0; i < names.length; i++) {
-        const name = names[i];
-        const relevance = relevanceLookup[name];
-        try {
-          console.log(`Hämtar GBIF-data för: ${name}`);
-          const observations = await fetchGBIFObservations(name);
-          console.log(`Antal observationer för ${name}:`, observations.length);
-          observations.forEach(obs => {
-            if (obs.decimalLatitude && obs.decimalLongitude) {
-              console.log(`Lägger till punkt: (${obs.decimalLatitude}, ${obs.decimalLongitude}) med relevans: ${relevance}`);
-              allPoints.push([
-                obs.decimalLatitude,
-                obs.decimalLongitude,
-                relevance
-              ]);
-            }
-          });
-        } catch (err) {
-          console.warn(`Kunde inte hämta GBIF-data för ${name}`);
-        }
-      }
-
-      if (heatLayer) map.removeLayer(heatLayer);
-      heatLayer = L.heatLayer(allPoints, {
-        radius: 20,
-        blur: 15,
-        maxZoom: 10
-      }).addTo(map);
-
-      if (allPoints.length === 0) {
-        alert("Inga observationer matchade CSV-datan.");
-      }
-    }
-
-    window.generateHeatmap = generateHeatmap;
-  </script>
-</body>
-</html>
+    
