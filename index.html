@@ -25,8 +25,8 @@
 </head>
 <body>
   <div class="controls">
-    <button onclick="generateHeatmap()">Visa heat map för nektarproduktion (GBIF)</button>
-    <button onclick="generateRelevanceHeatmap()">Visa heat map för biodiversitetsvärde (GBIF)</button>
+    <button onclick="generateHeatmap()">Visa heatmap för nektarproduktion (GBIF)</button>
+    <button onclick="generateRelevanceHeatmap()">Visa heatmap för biodiversitetsvärde (GBIF)</button>
   </div>
   <div id="loading">Laddar observationer...</div>
   <div id="map"></div>
@@ -68,7 +68,7 @@
       });
     }
 
-    async function fetchGBIFObservations(scientificName) {
+    async function fetchGBIFObservationsBatch(namesBatch) {
       const bounds = map.getBounds();
       const south = bounds.getSouth();
       const west = bounds.getWest();
@@ -77,7 +77,13 @@
       const wkt = `POLYGON((${west} ${south}, ${east} ${south}, ${east} ${north}, ${west} ${north}, ${west} ${south}))`;
       const today = new Date();
       const fromYear = today.getFullYear() - 5;
-      const url = `https://api.gbif.org/v1/occurrence/search?scientificName=${encodeURIComponent(scientificName)}&hasCoordinate=true&geometry=${encodeURIComponent(wkt)}&limit=150&year=${fromYear},${today.getFullYear()}`;
+
+      const url = new URL("https://api.gbif.org/v1/occurrence/search");
+      namesBatch.forEach(name => url.searchParams.append("scientificName", name));
+      url.searchParams.append("hasCoordinate", "true");
+      url.searchParams.append("geometry", wkt);
+      url.searchParams.append("limit", "300");
+      url.searchParams.append("year", `${fromYear},${today.getFullYear()}`);
 
       const response = await fetch(url);
       const data = await response.json();
@@ -95,23 +101,30 @@
       const points = [];
       const foundSpecies = [];
 
-      for (let i = 0; i < names.length; i++) {
-        const name = names[i];
-        const nectar = nectarLookup[name];
+      const batchSize = 300;
+      for (let i = 0; i < names.length; i += batchSize) {
+        const batch = names.slice(i, i + batchSize);
         try {
-          const observations = await fetchGBIFObservations(name);
-          let found = false;
+          const observations = await fetchGBIFObservationsBatch(batch);
+          const speciesSet = new Set(batch);
+          const foundInBatch = new Set();
+
           observations.forEach(obs => {
-            if (obs.decimalLatitude && obs.decimalLongitude) {
-              points.push([obs.decimalLatitude, obs.decimalLongitude, nectar]);
-              found = true;
+            const speciesName = obs.species || obs.scientificName;
+            if (obs.decimalLatitude && obs.decimalLongitude && speciesName && speciesSet.has(speciesName)) {
+              const value = nectarLookup[speciesName];
+              if (value) {
+                points.push([obs.decimalLatitude, obs.decimalLongitude, value]);
+                foundInBatch.add(speciesName);
+              }
             }
           });
-          if (found) foundSpecies.push(name);
-          loadingElement.textContent = `Laddar observationer... ${i + 1}/${names.length}`;
+
+          foundInBatch.forEach(species => foundSpecies.push(species));
+          loadingElement.textContent = `Laddar observationer... ${Math.min(i + batchSize, names.length)}/${names.length}`;
           await delay(250);
         } catch (err) {
-          console.warn(`Fel vid hämtning för art: ${name}`);
+          console.warn("Fel vid hämtning för batch", batch);
         }
       }
 
@@ -162,23 +175,30 @@
       const points = [];
       const foundSpecies = [];
 
-      for (let i = 0; i < names.length; i++) {
-        const name = names[i];
-        const relevance = relevanceLookup[name];
+      const batchSize = 300;
+      for (let i = 0; i < names.length; i += batchSize) {
+        const batch = names.slice(i, i + batchSize);
         try {
-          const observations = await fetchGBIFObservations(name);
-          let found = false;
+          const observations = await fetchGBIFObservationsBatch(batch);
+          const speciesSet = new Set(batch);
+          const foundInBatch = new Set();
+
           observations.forEach(obs => {
-            if (obs.decimalLatitude && obs.decimalLongitude) {
-              points.push([obs.decimalLatitude, obs.decimalLongitude, relevance]);
-              found = true;
+            const speciesName = obs.species || obs.scientificName;
+            if (obs.decimalLatitude && obs.decimalLongitude && speciesName && speciesSet.has(speciesName)) {
+              const value = relevanceLookup[speciesName];
+              if (value) {
+                points.push([obs.decimalLatitude, obs.decimalLongitude, value]);
+                foundInBatch.add(speciesName);
+              }
             }
           });
-          if (found) foundSpecies.push(name);
-          loadingElement.textContent = `Laddar observationer... ${i + 1}/${names.length}`;
-          await delay(400);
+
+          foundInBatch.forEach(species => foundSpecies.push(species));
+          loadingElement.textContent = `Laddar observationer... ${Math.min(i + batchSize, names.length)}/${names.length}`;
+          await delay(250);
         } catch (err) {
-          console.warn(`Fel vid hämtning för art: ${name}`);
+          console.warn("Fel vid hämtning för batch", batch);
         }
       }
 
