@@ -52,7 +52,15 @@
     }
 
     async function fetchGBIFObservations(scientificName) {
-      const url = `https://api.gbif.org/v1/occurrence/search?scientificName=${encodeURIComponent(scientificName)}&hasCoordinate=true&limit=100&country=SE`;
+      const bounds = map.getBounds();
+      const south = bounds.getSouth();
+      const west = bounds.getWest();
+      const north = bounds.getNorth();
+      const east = bounds.getEast();
+
+      const wkt = `POLYGON((${west} ${south}, ${east} ${south}, ${east} ${north}, ${west} ${north}, ${west} ${south}))`;
+      const url = `https://api.gbif.org/v1/occurrence/search?scientificName=${encodeURIComponent(scientificName)}&hasCoordinate=true&limit=100&geometry=${encodeURIComponent(wkt)}`;
+
       const response = await fetch(url);
       const data = await response.json();
       return data.results || [];
