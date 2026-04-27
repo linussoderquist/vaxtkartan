@@ -345,19 +345,7 @@
       box-shadow: 0 28px 80px rgba(0,0,0,.30);
     }
     .splat-wrap { position: relative; }
-    .viewer-top {
-      position: absolute;
-      z-index: 2;
-      top: 16px;
-      left: 16px;
-      border-radius: 999px;
-      background: rgba(255,255,255,.92);
-      color: #14231b;
-      padding: 10px 14px;
-      font-size: .86rem;
-      font-weight: 850;
-      box-shadow: 0 12px 24px rgba(0,0,0,.14);
-    }
+
     .splat-wrap iframe { display: block; width: 100%; height: 620px; border: 0; }
     .right-col { display: grid; gap: 14px; }
     .mini-thumb {
@@ -706,7 +694,7 @@
           </div>
         </aside>
         <main>
-          <div class="visual-card splat-wrap"><div class="viewer-top">◈ 3D (Gaussian Splat)</div><iframe title="Interaktiv 3D-modell av ${escapeHtml(item.name)}" allow="fullscreen; xr-spatial-tracking" src="${escapeHtml(item.viewerUrl)}"></iframe></div>
+          <div class="visual-card splat-wrap"><iframe title="Interaktiv 3D-modell av ${escapeHtml(item.name)}" allow="fullscreen; xr-spatial-tracking" src="${escapeHtml(item.viewerUrl)}"></iframe></div>
         </main>
         <aside class="right-col">
           <div class="mini-thumb" data-mini-photo="0"><img alt="${escapeHtml(item.name)} bild 1" />${illustrationHtml(item)}</div>
