@@ -244,41 +244,49 @@
     }
     .card:hover .arrow-dot { transform: translateX(4px); }
 
-    .splat-thumb {
+    .taxon-thumb {
       position: relative;
       height: 220px;
       overflow: hidden;
       border-radius: 26px;
-      background: #0c0a09;
+      background:
+        radial-gradient(circle at 35% 35%, rgba(172, 201, 151, .52), transparent 34%),
+        linear-gradient(135deg, #dde8d9, #c9d8c6);
     }
-    .splat-thumb iframe {
-      display: block;
+    .taxon-thumb img {
+      display: none;
       width: 100%;
       height: 100%;
-      border: 0;
-      pointer-events: none;
+      object-fit: cover;
     }
-    .splat-thumb::after {
+    .taxon-thumb.loaded img { display: block; }
+    .taxon-thumb.loaded .fallback-illustration { display: none; }
+    .taxon-thumb::after {
       content: "";
       position: absolute;
       inset: 0;
       pointer-events: none;
       background:
-        linear-gradient(180deg, transparent 52%, rgba(0,0,0,.42)),
-        linear-gradient(115deg, rgba(255,255,255,.08), transparent 46%);
+        linear-gradient(180deg, transparent 48%, rgba(0,0,0,.46)),
+        linear-gradient(115deg, rgba(255,255,255,.12), transparent 46%);
     }
-    .splat-thumb-label {
+    .taxon-thumb-label {
       position: absolute;
       left: 14px;
       bottom: 14px;
       z-index: 2;
       border-radius: 999px;
-      background: rgba(255,255,255,.88);
+      background: rgba(255,255,255,.90);
       color: #1c1917;
       padding: 7px 11px;
       font-size: .78rem;
       font-weight: 800;
       box-shadow: 0 8px 18px rgba(0,0,0,.16);
+    }
+    .fallback-illustration {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
     }
 
     .illustration {
@@ -612,15 +620,53 @@
           </div>
         </button>
       `).join("");
+      loadGalleryPhotos(filtered);
     }
 
     function galleryPreviewHtml(item) {
       return `
-        <div class="splat-thumb" aria-label="3D-preview av ${escapeHtml(item.name)}">
-          <iframe loading="lazy" tabindex="-1" title="3D-preview av ${escapeHtml(item.name)}" allow="fullscreen; xr-spatial-tracking" src="${escapeHtml(item.viewerUrl)}"></iframe>
-          <span class="splat-thumb-label">3D-preview</span>
+        <div class="taxon-thumb" data-photo-for="${escapeHtml(item.id)}" aria-label="Bild av ${escapeHtml(item.name)}">
+          <img alt="${escapeHtml(item.name)}" loading="lazy" />
+          <div class="fallback-illustration">
+            ${illustrationHtml(item)}
+          </div>
+          <span class="taxon-thumb-label">Artbild</span>
         </div>
       `;
+    }
+
+    async function fetchINaturalistPhoto(item) {
+      const cacheKey = `inat-photo:${item.latin}`;
+      const cached = localStorage.getItem(cacheKey);
+      if (cached) return cached === "NONE" ? null : cached;
+
+      const endpoint = `https://api.inaturalist.org/v1/taxa?q=${encodeURIComponent(item.latin)}&rank=species&per_page=5`;
+      try {
+        const response = await fetch(endpoint);
+        if (!response.ok) throw new Error(`iNaturalist svarade ${response.status}`);
+        const data = await response.json();
+        const results = Array.isArray(data.results) ? data.results : [];
+        const exact = results.find(taxon => String(taxon.name).toLowerCase() === item.latin.toLowerCase()) || results[0];
+        const photo = exact && exact.default_photo;
+        const url = photo && (photo.medium_url || photo.square_url || photo.url);
+        localStorage.setItem(cacheKey, url || "NONE");
+        return url || null;
+      } catch (error) {
+        console.warn("Kunde inte hämta artbild från iNaturalist", item.latin, error);
+        return null;
+      }
+    }
+
+    async function loadGalleryPhotos(items) {
+      for (const item of items) {
+        const thumb = document.querySelector(`[data-photo-for="${CSS.escape(item.id)}"]`);
+        if (!thumb || thumb.classList.contains("loaded")) continue;
+        const img = thumb.querySelector("img");
+        const photoUrl = await fetchINaturalistPhoto(item);
+        if (!photoUrl || !img) continue;
+        img.src = photoUrl;
+        img.onload = () => thumb.classList.add("loaded");
+      }
     }
 
     function illustrationHtml(item, large = false) {
