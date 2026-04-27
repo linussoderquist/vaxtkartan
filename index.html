@@ -514,6 +514,7 @@
         ecology: "Arten är beroende av rätt markkemi, fungerande mykorrhizasvampar och stabila växtplatser. Den kan finnas kvar länge på samma plats men är känslig för tramp, igenväxning och förändrad hydrologi.",
         lookFor: ["Stor gul toffelformad blomläpp", "Brunröda kalkblad", "Breda veckade blad", "Ofta i kalkpåverkad skog"],
         viewerUrl: "https://superspl.at/s?id=b46fcc5b",
+        localImage: "./assets/Cyp_cal.png",
         accent: "yellow",
         illustrationClass: "guckusko"
       },
@@ -534,6 +535,7 @@
         ecology: "Svampen orsakar kärnröta i tall och skapar livsmiljöer för andra arter. Den är därför både en art i sig och en ekologisk motor i gamla tallmiljöer.",
         lookFor: ["Hård hovformad fruktkropp", "Växer på levande tall", "Ofta högt upp på stammen", "Kopplad till gamla tallar"],
         viewerUrl: "https://superspl.at/s?id=22d49954",
+        localImage: "./assets/Por_pin.png",
         accent: "green",
         illustrationClass: "tallticka"
       }
@@ -601,6 +603,9 @@
     }
 
     function galleryPreviewHtml(item) {
+      if (item.localImage) {
+        return `<div class="taxon-thumb loaded"><img src="${escapeHtml(item.localImage)}" alt="${escapeHtml(item.name)}" loading="lazy" style="display:block;" /></div>`;
+      }
       return `<div class="taxon-thumb" data-photo-for="${escapeHtml(item.id)}"><img alt="${escapeHtml(item.name)}" loading="lazy" /><div class="fallback-illustration">${illustrationHtml(item)}</div></div>`;
     }
 
@@ -639,6 +644,7 @@
 
     async function loadGalleryPhotos(items) {
       for (const item of items) {
+        if (item.localImage) continue;
         const thumb = document.querySelector(`[data-photo-for="${CSS.escape(item.id)}"]`);
         if (!thumb || thumb.classList.contains("loaded")) continue;
         const img = thumb.querySelector("img");
@@ -716,6 +722,15 @@
     }
 
     async function loadSpeciesPhotos(item) {
+      if (item.localImage) {
+        document.querySelectorAll("[data-mini-photo]").forEach((thumb) => {
+          const img = thumb.querySelector("img");
+          if (!img) return;
+          img.src = item.localImage;
+          img.onload = () => thumb.classList.add("loaded");
+        });
+        return;
+      }
       const photos = await fetchINaturalistPhotos(item, 3);
       document.querySelectorAll("[data-mini-photo]").forEach((thumb, index) => {
         const img = thumb.querySelector("img");
