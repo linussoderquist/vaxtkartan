@@ -513,7 +513,7 @@
         <header class="wrap topbar">
           <button class="brand" type="button" onclick="showGallery()">
             <span class="brand-mark">♧</span>
-            <span><span class="brand-title">Digital flora</span><span class="brand-sub">3D-arter, ekologi och utbredning</span></span>
+            <span><span class="brand-title">Digital flora</span><span class="brand-sub">Signalarter i 3D</span></span>
           </button>
           <nav class="nav">
             <a class="active" href="#gallery-page">Artgalleri</a>
@@ -652,201 +652,38 @@
         selectedFlags.has(flag) ? selectedFlags.delete(flag) : selectedFlags.add(flag);
         if (selectedFlags.size === 0) selectedFlags.add("Alla");
       }
-      renderFilters(); renderGallery();
-    }
-
-    function clearFilters() {
-      selectedFlags.clear();
-      selectedFlags.add("Alla");
-      selectedSignalLevel = null;
-      renderFilters();
-      renderSignalFilter();
-      renderGallery();
-    }
-
-    function setSignalFilter(level) {
-      selectedSignalLevel = level;
-      renderSignalFilter();
-      renderGallery();
-    }
-
-    function renderSignalFilter() {
-      document.querySelectorAll("[data-signal-filter]").forEach((button) => {
-        button.classList.toggle("active", Number(button.dataset.signalFilter) === selectedSignalLevel);
-      });
-      const reset = document.getElementById("signal-reset");
-      if (reset) reset.classList.toggle("active", selectedSignalLevel === null);
-    }
-
-    function matches(item, query) {
-      const text = `${item.name} ${item.latin} ${item.group} ${item.subgroup} ${item.status} ${item.flags.join(" ")}`.toLowerCase();
-      const activeFlags = [...selectedFlags].filter(flag => flag !== "Alla");
-      return (!query || text.includes(query)) &&
-        (activeFlags.length === 0 || activeFlags.every(flag => item.flags.includes(flag))) &&
-        (selectedSignalLevel === null || item.signalLevel === selectedSignalLevel);
-    }
-
-    function renderGallery() {
-      const query = document.getElementById("search").value.trim().toLowerCase();
-      const filtered = species.filter(item => matches(item, query));
-      document.getElementById("count").textContent = `${filtered.length} av ${species.length} arter visas`;
-      document.getElementById("empty").hidden = filtered.length !== 0;
-      document.getElementById("gallery").innerHTML = filtered.map(item => `
-        <button class="card" type="button" onclick="showSpecies('${item.id}')">
-          ${galleryPreviewHtml(item)}
-          <div class="card-body">
-            <h3>${escapeHtml(item.name)}</h3>
-            <p class="latin">${escapeHtml(item.latin)}</p>
-            <div class="tag-row">
-              <span class="tag ${item.accent}">${escapeHtml(item.subgroup)}</span>
-              <span class="tag">${escapeHtml(item.status.split(" i ")[0])}</span>
-              <span class="open-arrow">→</span>
-            </div>
-          </div>
-        </button>
-      `).join("");
-      loadGalleryPhotos(filtered);
-    }
-
-    function galleryPreviewHtml(item) {
-      if (item.localImage) {
-        return `<div class="taxon-thumb loaded"><img src="${escapeHtml(item.localImage)}" alt="${escapeHtml(item.name)}" loading="lazy" style="display:block;" /></div>`;
-      }
-      return `<div class="taxon-thumb" data-photo-for="${escapeHtml(item.id)}"><img alt="${escapeHtml(item.name)}" loading="lazy" /><div class="fallback-illustration">${illustrationHtml(item)}</div></div>`;
-    }
-
-    async function fetchINaturalistPhotos(item, count = 5) {
-      const cacheKey = `${item.latin}:${count}`;
-      if (photoCache.has(cacheKey)) return photoCache.get(cacheKey);
-
-      const url = `https://api.inaturalist.org/v1/observations?taxon_name=${encodeURIComponent(item.latin)}&photos=true&quality_grade=research&per_page=${Math.max(count, 8)}&order_by=votes`;
-      try {
-        const response = await fetch(url, { cache: "no-store" });
-        if (!response.ok) throw new Error(response.status);
-        const data = await response.json();
-        const observations = Array.isArray(data.results) ? data.results : [];
-        const urls = [];
-
-        for (const obs of observations) {
-          const photos = Array.isArray(obs.photos) ? obs.photos : [];
-          for (const photo of photos) {
-            let photoUrl = photo.url || photo.medium_url || photo.square_url;
-            if (!photoUrl) continue;
-            photoUrl = photoUrl.replace("square.", "medium.").replace("small.", "medium.");
-            urls.push(photoUrl);
-            if (urls.length >= count) break;
-          }
-          if (urls.length >= count) break;
-        }
-
-        photoCache.set(cacheKey, urls);
-        return urls;
-      } catch (error) {
-        console.warn("Kunde inte hämta artbilder från iNaturalist", item.latin, error);
-        photoCache.set(cacheKey, []);
-        return [];
-      }
-    }
-
-    async function loadGalleryPhotos(items) {
-      for (const item of items) {
-        if (item.localImage) continue;
-        const thumb = document.querySelector(`[data-photo-for="${CSS.escape(item.id)}"]`);
-        if (!thumb || thumb.classList.contains("loaded")) continue;
-        const img = thumb.querySelector("img");
-        const photos = await fetchINaturalistPhotos(item, 1);
-        if (!photos[0] || !img) continue;
-        img.src = photos[0];
-        img.onload = () => thumb.classList.add("loaded");
-      }
-    }
-
-    function illustrationHtml(item) {
-      const symbolClass = item.id === "guckusko" ? "guckusko-symbol" : "tallticka-symbol";
-      return `<div class="illustration ${item.illustrationClass}"><div class="${symbolClass}"></div></div>`;
-    }
-
-    function showSpecies(id) {
+      function renderRouteFromLocation() {
+      const id = location.hash.replace("#", "");
       const item = species.find(entry => entry.id === id);
-      if (!item) return;
-      document.getElementById("gallery-page").style.display = "none";
-      const page = document.getElementById("species-page");
-      page.style.display = "block";
-      page.innerHTML = speciesPageHtml(item);
-      window.scrollTo({ top: 0, behavior: "instant" });
-      history.replaceState(null, "", `#${item.id}`);
-      loadSpeciesPhotos(item);
+
+      if (item) {
+        document.getElementById("gallery-page").style.display = "none";
+        const page = document.getElementById("species-page");
+        page.style.display = "block";
+        page.innerHTML = speciesPageHtml(item);
+        window.scrollTo({ top: 0, behavior: "instant" });
+        loadSpeciesPhotos(item);
+      } else {
+        document.getElementById("gallery-page").style.display = "block";
+        const page = document.getElementById("species-page");
+        page.style.display = "none";
+        page.innerHTML = "";
+        window.scrollTo({ top: 0, behavior: "instant" });
+      }
     }
 
-    function showGallery() {
-      document.getElementById("gallery-page").style.display = "block";
-      const page = document.getElementById("species-page");
-      page.style.display = "none";
-      page.innerHTML = "";
-      history.replaceState(null, "", location.pathname);
-      window.scrollTo({ top: 0, behavior: "instant" });
-    }
-
-    function pyramidHtml(item) {
-      return `<div class="pyramid-box"><div class="pyramid">
-        <div class="pyramid-part top ${item.signalLevel === 3 ? "active" : ""}"></div>
-        <div class="pyramid-part mid ${item.signalLevel === 2 ? "active" : ""}"></div>
-        <div class="pyramid-part base ${item.signalLevel === 1 ? "active" : ""}"></div>
-      </div><div class="pyramid-note">Utifrån Nitare, 2020.</div></div>`;
-    }
-
-    function speciesPageHtml(item) {
-      return `<div class="species-shell"><div class="species-layout">
-        <aside>
-          <button class="back-btn" type="button" onclick="showGallery()">← Tillbaka till galleri</button>
-          <h1 class="species-title">${escapeHtml(item.name)}</h1>
-          <p class="species-latin">${escapeHtml(item.latin)}</p>
-          <div class="species-tags"><span class="tag ${item.accent}">${escapeHtml(item.subgroup)}</span><span class="tag">${escapeHtml(item.status.split(" i ")[0])}</span><span class="tag">${escapeHtml(item.group)}</span></div>
-          <p class="species-desc">${escapeHtml(item.description)} ${escapeHtml(item.ecology)}</p>
-          <div class="facts">
-            <div class="fact"><span class="fact-icon">♧</span><div><strong>Grupp</strong>${escapeHtml(item.group)}</div></div>
-            <div class="fact"><span class="fact-icon">✽</span><div><strong>Familj</strong>${escapeHtml(item.family)}</div></div>
-            <div class="fact"><span class="fact-icon">☼</span><div><strong>Blomningstid</strong>${escapeHtml(item.flowering)}</div></div>
-            <div class="fact"><span class="fact-icon">♧</span><div><strong>Livsmiljö</strong>${escapeHtml(item.habitat)}</div></div>
-            <div class="fact"><span class="fact-icon">↓</span><div><strong>Status</strong>${escapeHtml(item.status)}</div></div>
-          </div>
-        </aside>
-        <main>
-          <div class="visual-card splat-wrap"><iframe title="Interaktiv 3D-modell av ${escapeHtml(item.name)}" allow="fullscreen; xr-spatial-tracking" src="${escapeHtml(item.viewerUrl)}"></iframe></div>
-        </main>
-        <aside class="right-col">
-          <div class="mini-thumb" data-mini-photo="0"><img alt="${escapeHtml(item.name)} bild 1" />${illustrationHtml(item)}</div>
-          <div class="mini-thumb" data-mini-photo="1"><img alt="${escapeHtml(item.name)} bild 2" />${illustrationHtml(item)}</div>
-          <div class="mini-thumb" data-mini-photo="2"><img alt="${escapeHtml(item.name)} bild 3" />${illustrationHtml(item)}</div>
-          ${pyramidHtml(item)}
-        </aside>
-        <section class="species-bottom">
-          <article class="white-card"><div class="card-title">Utbredning</div><p>${escapeHtml(item.distribution)}</p><div class="map-placeholder">Här kan en fyndkarta eller Artportalen/GBIF-modul kopplas in senare.</div></article>
-          <article class="white-card"><div class="card-title">Kännetecken</div><ul class="look-list">${item.lookFor.map(point => `<li><span class="dot ${item.accent === "yellow" ? "yellow" : ""}"></span>${escapeHtml(point)}</li>`).join("")}</ul></article>
-        </section>
-      </div></div>`;
-    }
-
-    async function loadSpeciesPhotos(item) {
-      const photos = await fetchINaturalistPhotos(item, 3);
-
-      document.querySelectorAll("[data-mini-photo]").forEach((thumb, index) => {
-        const img = thumb.querySelector("img");
-        if (!img) return;
-
-        const photoUrl = photos[index] || item.localImage;
-        if (!photoUrl) return;
-
-        img.src = photoUrl;
-        img.onload = () => thumb.classList.add("loaded");
-      });
-    }
+    window.addEventListener("popstate", renderRouteFromLocation);
 
     renderFilters();
-    renderSignalFilter();
     renderGallery();
-    const initialId = location.hash.replace("#", "");
-    if (species.some(item => item.id === initialId)) showSpecies(initialId);
+
+    if (location.hash) {
+      history.replaceState({ view: "species", id: location.hash.replace("#", "") }, "", location.href);
+      renderRouteFromLocation();
+    } else {
+      history.replaceState({ view: "gallery" }, "", location.pathname);
+    }
+  </script>.some(item => item.id === initialId)) showSpecies(initialId);
   </script>
 </body>
 </html>
