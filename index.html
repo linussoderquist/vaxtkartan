@@ -6,261 +6,219 @@
   <title>Digital flora – 3D-arter</title>
   <style>
     :root {
-      --ink: #0f1f19;
-      --muted: #58665e;
-      --forest: #10261d;
-      --forest-2: #173527;
-      --moss: #abcfa2;
+      --ink: #10231b;
       --cream: #f4f1e8;
-      --paper: rgba(255,255,255,.88);
-      --paper-solid: #f7f6f0;
-      --line: rgba(255,255,255,.26);
-      --dark-line: rgba(15,31,25,.12);
-      --shadow: 0 24px 70px rgba(0,0,0,.22);
-      --soft-shadow: 0 16px 40px rgba(15,31,25,.12);
-      --radius-lg: 28px;
-      --radius-md: 20px;
+      --forest: #0b1913;
+      --forest2: #172d22;
+      --line: rgba(255,255,255,.24);
+      --shadow: 0 24px 80px rgba(0,0,0,.28);
+      --soft: 0 18px 50px rgba(10,24,17,.14);
     }
-
     * { box-sizing: border-box; }
     html { scroll-behavior: smooth; }
     body {
       margin: 0;
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       color: var(--ink);
-      background: var(--paper-solid);
+      background: #102119;
     }
     button, input { font: inherit; }
     button { cursor: pointer; }
-    a { color: inherit; }
-
-    .page { min-height: 100vh; }
     .wrap { width: min(1180px, calc(100% - 48px)); margin: 0 auto; }
 
-    .forest-panel {
-      position: relative;
-      min-height: 720px;
-      overflow: hidden;
+    /* GALLERY */
+    #gallery-page { min-height: 100vh; }
+    .forest {
+      min-height: 760px;
       color: white;
+      position: relative;
+      overflow: hidden;
       background:
-        linear-gradient(180deg, rgba(7,20,15,.22), rgba(7,20,15,.74)),
-        radial-gradient(circle at 20% 20%, rgba(196,223,180,.18), transparent 34%),
+        linear-gradient(180deg, rgba(5,15,10,.18), rgba(5,15,10,.78)),
+        radial-gradient(circle at 28% 6%, rgba(230,238,221,.28), transparent 27%),
+        radial-gradient(circle at 74% 28%, rgba(120,150,110,.18), transparent 30%),
         url("assets/scandinavian-wet-forest.jpg") center/cover no-repeat,
-        linear-gradient(135deg, #18281e, #324636 46%, #111e18);
+        linear-gradient(135deg, #16261c, #2e4535 45%, #08120d);
     }
-    .forest-panel::before {
+    .forest::after {
       content: "";
       position: absolute;
       inset: 0;
-      background:
-        linear-gradient(90deg, rgba(255,255,255,.06), transparent 16%, transparent 78%, rgba(255,255,255,.05)),
-        radial-gradient(ellipse at top, rgba(255,255,255,.30), transparent 46%);
+      background: rgba(5,16,11,.20);
       pointer-events: none;
     }
-    .forest-panel::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-      backdrop-filter: saturate(.86);
-      background: rgba(4,17,12,.16);
-    }
-    .forest-content { position: relative; z-index: 2; padding: 26px 0 54px; }
-
+    .forest-inner { position: relative; z-index: 1; padding: 32px 0 58px; }
     .topbar {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 24px;
-      padding-bottom: 22px;
-      border-bottom: 1px solid rgba(255,255,255,.16);
+      gap: 22px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid rgba(255,255,255,.18);
     }
     .brand {
       display: flex;
+      gap: 14px;
       align-items: center;
-      gap: 13px;
-      border: 0;
+      color: white;
       background: transparent;
-      color: inherit;
-      text-align: left;
+      border: 0;
       padding: 0;
+      text-align: left;
     }
     .brand-mark {
-      width: 42px;
-      height: 42px;
-      border-radius: 999px;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
       display: grid;
       place-items: center;
       border: 1px solid rgba(255,255,255,.45);
       background: rgba(255,255,255,.10);
       backdrop-filter: blur(14px);
-      font-size: 1.18rem;
+      font-size: 1.2rem;
     }
-    .brand-title { display: block; font-size: 1.05rem; font-weight: 760; letter-spacing: -.02em; }
-    .brand-sub { display: block; margin-top: 2px; font-size: .88rem; color: rgba(255,255,255,.74); }
-    .nav { display: flex; align-items: center; gap: 22px; }
+    .brand-title { display: block; font-weight: 800; font-size: 1.12rem; }
+    .brand-sub { display: block; color: rgba(255,255,255,.74); font-size: .9rem; margin-top: 2px; }
+    .nav { display: flex; align-items: center; gap: 26px; }
     .nav a, .nav button {
-      border: 0;
-      background: transparent;
       color: rgba(255,255,255,.86);
+      background: transparent;
+      border: 0;
       text-decoration: none;
-      font-weight: 650;
+      font-weight: 700;
       padding: 8px 0;
     }
     .nav .active { color: white; border-bottom: 2px solid white; }
     .info-dot {
-      width: 28px;
-      height: 28px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,.48);
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
       display: grid;
       place-items: center;
-      color: white;
+      border: 1px solid rgba(255,255,255,.42);
     }
-
-    .gallery-head {
-      padding-top: 54px;
-      display: grid;
-      grid-template-columns: minmax(280px, 440px) 1fr;
-      gap: 36px;
-      align-items: end;
-    }
+    .gallery-hero { padding-top: 58px; }
     h1 {
       margin: 0;
       font-family: Georgia, "Times New Roman", serif;
       font-weight: 500;
-      letter-spacing: -.045em;
-      font-size: clamp(3rem, 7vw, 5.4rem);
-      line-height: .98;
+      letter-spacing: -.05em;
+      font-size: clamp(3.4rem, 7vw, 5.7rem);
+      line-height: .95;
     }
-    .gallery-tools { display: grid; gap: 16px; justify-items: start; }
-    .search-wrap { position: relative; width: min(390px, 100%); }
-    .search-wrap svg { position: absolute; left: 17px; top: 50%; transform: translateY(-50%); color: rgba(255,255,255,.74); }
+    .search-row {
+      margin-top: 24px;
+      display: grid;
+      grid-template-columns: 390px 1fr;
+      gap: 34px;
+      align-items: start;
+    }
+    .search-wrap { position: relative; }
+    .search-wrap svg {
+      position: absolute;
+      left: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: rgba(255,255,255,.74);
+    }
     .search-input {
       width: 100%;
-      border: 1px solid rgba(255,255,255,.28);
+      border: 1px solid rgba(255,255,255,.30);
       border-radius: 999px;
-      padding: 15px 18px 15px 48px;
+      padding: 16px 18px 16px 50px;
       outline: none;
       color: white;
-      background: rgba(255,255,255,.13);
+      background: rgba(255,255,255,.14);
       backdrop-filter: blur(18px);
       box-shadow: 0 14px 30px rgba(0,0,0,.18);
     }
     .search-input::placeholder { color: rgba(255,255,255,.78); }
-    .search-input:focus { border-color: rgba(255,255,255,.68); background: rgba(255,255,255,.18); }
     .filters { display: flex; flex-wrap: wrap; gap: 12px; }
     .filter-chip {
       border: 1px solid rgba(255,255,255,.22);
       color: white;
       background: rgba(255,255,255,.15);
       border-radius: 999px;
-      padding: 11px 19px;
-      box-shadow: 0 12px 28px rgba(0,0,0,.14);
+      padding: 12px 21px;
       backdrop-filter: blur(18px);
-      transition: .18s ease;
+      box-shadow: 0 12px 28px rgba(0,0,0,.14);
     }
-    .filter-chip:hover { background: rgba(255,255,255,.24); transform: translateY(-1px); }
-    .filter-chip.active { background: rgba(255,255,255,.92); color: var(--ink); }
+    .filter-chip.active { background: rgba(255,255,255,.92); color: #13231b; }
     .clear-btn {
-      margin-left: auto;
       border: 0;
       background: transparent;
       color: rgba(255,255,255,.86);
-      font-weight: 650;
-      text-decoration: none;
+      font-weight: 700;
+      margin-left: auto;
     }
-
-    .gallery-count { color: rgba(255,255,255,.70); margin: 28px 0 18px; }
+    .gallery-count { margin: 34px 0 18px; color: rgba(255,255,255,.70); }
     .gallery {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 22px;
+      grid-template-columns: repeat(5, minmax(170px, 1fr));
+      gap: 18px;
     }
     .card {
       overflow: hidden;
-      border: 1px solid rgba(255,255,255,.24);
+      border: 1px solid rgba(255,255,255,.26);
       border-radius: 16px;
-      background: rgba(245,245,239,.88);
-      color: var(--ink);
+      background: rgba(17,32,24,.62);
+      color: white;
+      padding: 0;
       text-align: left;
       box-shadow: var(--shadow);
-      transition: .20s ease;
-      padding: 0;
-      min-height: 282px;
+      backdrop-filter: blur(18px);
+      transition: .18s ease;
     }
-    .card:hover { transform: translateY(-5px); border-color: rgba(255,255,255,.48); }
+    .card:hover { transform: translateY(-5px); background: rgba(22,41,30,.72); }
     .taxon-thumb {
-      height: 154px;
+      height: 230px;
       overflow: hidden;
-      background:
-        radial-gradient(circle at 38% 42%, rgba(172,201,151,.52), transparent 32%),
-        linear-gradient(135deg, #dfeadd, #becbb8);
+      background: linear-gradient(135deg, #1c2f23, #0d1912);
+      position: relative;
     }
     .taxon-thumb img {
       display: none;
       width: 100%;
       height: 100%;
       object-fit: cover;
-      filter: saturate(.88) contrast(.98);
+      filter: saturate(.86) contrast(1.02) brightness(.88);
     }
     .taxon-thumb.loaded img { display: block; }
     .taxon-thumb.loaded .fallback-illustration { display: none; }
-    .fallback-illustration { height: 100%; }
-    .card-body { padding: 16px 16px 15px; }
-    .card h3 { margin: 0; font-size: 1.36rem; letter-spacing: -.035em; }
-    .latin { margin: 4px 0 0; font-style: italic; color: #69746c; }
-    .tag-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; align-items: center; }
+    .fallback-illustration { position: absolute; inset: 0; }
+    .card-body {
+      padding: 18px;
+      background: linear-gradient(180deg, rgba(17,31,23,.78), rgba(10,21,15,.92));
+    }
+    .card h3 {
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 1.55rem;
+      font-weight: 560;
+      letter-spacing: -.035em;
+      color: #fffaf0;
+    }
+    .latin { margin: 5px 0 0; font-style: italic; color: rgba(255,255,255,.74); }
+    .tag-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 14px; }
     .tag {
       border-radius: 999px;
       padding: 7px 11px;
       font-size: .78rem;
-      font-weight: 740;
-      background: #e8ebe2;
-      color: #425047;
+      font-weight: 760;
+      color: rgba(255,255,255,.92);
+      background: rgba(255,255,255,.16);
+      border: 1px solid rgba(255,255,255,.10);
     }
-    .tag.yellow { background: #f5d77a; color: #5c4210; }
-    .tag.green { background: #94e6bf; color: #123f31; }
+    .tag.yellow { background: rgba(245,215,122,.80); color: #3c2a08; }
+    .tag.green { background: rgba(99,207,155,.55); color: white; }
     .open-arrow {
       margin-left: auto;
       width: 28px;
       height: 28px;
       display: grid;
       place-items: center;
-      border-radius: 999px;
-      background: rgba(255,255,255,.55);
-    }
-
-    .illustration {
-      position: relative;
-      height: 100%;
-      overflow: hidden;
-      background: linear-gradient(135deg, #f3ecc7, #dcecc9, #c8dfcf);
-    }
-    .illustration.large { height: 330px; border-radius: 22px; }
-    .illustration.tallticka { background: linear-gradient(135deg, #d9dfd6, #c5d7c7, #e6e1cc); }
-    .guckusko-symbol, .tallticka-symbol { position: absolute; inset: 0; display: grid; place-items: center; }
-    .guckusko-symbol::before {
-      content: "";
-      width: 142px;
-      height: 142px;
-      border-radius: 58% 42% 52% 48%;
-      background:
-        radial-gradient(circle at 50% 52%, #f8d83a 0 25%, transparent 26%),
-        radial-gradient(ellipse at 32% 31%, rgba(94,43,22,.78) 0 22%, transparent 23%),
-        radial-gradient(ellipse at 68% 31%, rgba(94,43,22,.78) 0 22%, transparent 23%),
-        linear-gradient(90deg, transparent 48%, rgba(44,122,83,.62) 49% 52%, transparent 53%);
-      filter: drop-shadow(0 18px 18px rgba(15,31,25,.12));
-    }
-    .tallticka-symbol::before {
-      content: "";
-      width: 156px;
-      height: 156px;
-      background:
-        radial-gradient(ellipse at 43% 45%, rgba(91,88,82,.95) 0 24%, transparent 25%),
-        radial-gradient(ellipse at 44% 56%, rgba(50,47,43,.88) 0 17%, transparent 18%),
-        linear-gradient(90deg, transparent 50%, rgba(70,76,66,.54) 51% 70%, transparent 71%);
-      filter: drop-shadow(0 18px 18px rgba(15,31,25,.14));
+      border-radius: 50%;
+      background: rgba(255,255,255,.14);
     }
     .empty {
       border: 1px solid rgba(255,255,255,.22);
@@ -271,256 +229,249 @@
       backdrop-filter: blur(14px);
     }
 
-    .species-page { display: none; background: var(--paper-solid); min-height: 100vh; }
-    .species-layout {
-      display: grid;
-      grid-template-columns: 420px 1fr;
-      min-height: 100vh;
+    /* FALLBACK ILLUSTRATIONS */
+    .illustration {
+      position: relative;
+      height: 100%;
+      background: linear-gradient(135deg, #304c38, #0f1d15);
     }
-    .species-info {
-      padding: 42px 40px 50px max(40px, calc((100vw - 1180px) / 2));
+    .illustration.large { height: 100%; }
+    .illustration.tallticka { background: linear-gradient(135deg, #2f3d33, #111d16); }
+    .guckusko-symbol, .tallticka-symbol { position: absolute; inset: 0; display: grid; place-items: center; }
+    .guckusko-symbol::before {
+      content: "";
+      width: 148px;
+      height: 148px;
+      border-radius: 58% 42% 52% 48%;
       background:
-        radial-gradient(circle at 20% 0%, rgba(171,207,162,.24), transparent 35%),
-        linear-gradient(180deg, #f7f6f0, #eeeee8);
+        radial-gradient(circle at 50% 52%, #f4d23a 0 25%, transparent 26%),
+        radial-gradient(ellipse at 32% 31%, rgba(90,42,22,.82) 0 22%, transparent 23%),
+        radial-gradient(ellipse at 68% 31%, rgba(90,42,22,.82) 0 22%, transparent 23%),
+        linear-gradient(90deg, transparent 48%, rgba(78,151,108,.75) 49% 52%, transparent 53%);
+      filter: drop-shadow(0 18px 18px rgba(0,0,0,.18));
+    }
+    .tallticka-symbol::before {
+      content: "";
+      width: 160px;
+      height: 160px;
+      background:
+        radial-gradient(ellipse at 43% 45%, rgba(91,88,82,.95) 0 24%, transparent 25%),
+        radial-gradient(ellipse at 44% 56%, rgba(50,47,43,.88) 0 17%, transparent 18%),
+        linear-gradient(90deg, transparent 50%, rgba(110,120,100,.54) 51% 70%, transparent 71%);
+      filter: drop-shadow(0 18px 18px rgba(0,0,0,.20));
+    }
+
+    /* SPECIES PAGE */
+    #species-page {
+      display: none;
+      min-height: 100vh;
+      color: white;
+      background:
+        radial-gradient(circle at 0% 0%, rgba(120,150,110,.18), transparent 28%),
+        linear-gradient(135deg, #1a3024, #0d1d15 55%, #07120d);
+    }
+    .species-layout {
+      width: min(1180px, calc(100% - 48px));
+      min-height: 100vh;
+      margin: 0 auto;
+      padding: 46px 0;
+      display: grid;
+      grid-template-columns: 250px minmax(410px, 1fr) 300px;
+      gap: 24px;
+      align-items: start;
     }
     .back-btn {
       display: inline-flex;
-      gap: 9px;
       align-items: center;
+      gap: 9px;
+      margin-bottom: 46px;
+      padding: 0;
       border: 0;
       background: transparent;
-      color: #334238;
-      padding: 0;
-      font-weight: 650;
-      margin-bottom: 34px;
+      color: rgba(255,255,255,.84);
+      font-weight: 700;
     }
     .species-title {
       margin: 0;
       font-family: Georgia, "Times New Roman", serif;
-      font-size: clamp(3rem, 6vw, 4.8rem);
+      font-size: clamp(3.1rem, 5vw, 4.8rem);
       font-weight: 500;
-      line-height: .98;
-      letter-spacing: -.045em;
-      color: #173527;
+      line-height: .96;
+      letter-spacing: -.05em;
+      color: #fffaf0;
     }
-    .species-info .latin { font-size: 1.35rem; margin-top: 10px; }
-    .species-tags { display: flex; flex-wrap: wrap; gap: 9px; margin: 24px 0; }
-    .species-desc { color: #36443a; line-height: 1.75; font-size: 1.02rem; }
-    .facts {
-      display: grid;
-      gap: 18px;
-      margin: 36px 0 34px;
-    }
+    .species-latin { margin: 12px 0 0; color: rgba(255,255,255,.72); font-style: italic; font-size: 1.25rem; }
+    .species-tags { display: flex; flex-wrap: wrap; gap: 9px; margin: 24px 0 28px; }
+    .species-desc { color: rgba(255,255,255,.78); line-height: 1.72; font-size: .98rem; }
+    .facts { display: grid; gap: 22px; margin-top: 38px; }
     .fact {
       display: grid;
-      grid-template-columns: 34px 1fr;
-      gap: 14px;
-      color: #405047;
+      grid-template-columns: 28px 1fr;
+      gap: 13px;
+      color: rgba(255,255,255,.86);
+      line-height: 1.38;
     }
     .fact-icon {
-      width: 30px;
-      height: 30px;
-      border-radius: 999px;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
       display: grid;
       place-items: center;
-      border: 1px solid rgba(18,63,49,.22);
-      color: #173527;
+      border: 1px solid rgba(255,255,255,.35);
+      color: rgba(255,255,255,.90);
+      font-size: .82rem;
     }
-    .fact strong { display: block; color: #69746c; font-weight: 650; margin-bottom: 3px; }
-
-    .pyramid-card { margin-top: 34px; }
-    .pyramid {
-      width: min(260px, 84%);
-      display: grid;
-      gap: 9px;
-      margin: 0 auto;
-      justify-items: center;
-    }
-    .pyramid-part {
-      height: 56px;
-      opacity: .44;
-      background: #d7d8ce;
-      clip-path: polygon(50% 0, 100% 100%, 0 100%);
-      transition: .2s ease;
-    }
-    .pyramid-part.top { width: 86px; background: #174332; opacity: .42; }
-    .pyramid-part.mid {
-      width: 166px;
-      clip-path: polygon(25% 0, 75% 0, 100% 100%, 0 100%);
-      background: #aeb9ab;
-    }
-    .pyramid-part.base {
-      width: 248px;
-      clip-path: polygon(17% 0, 83% 0, 100% 100%, 0 100%);
-      background: #d8d3c9;
-    }
-    .pyramid-part.active {
-      opacity: 1;
-      background: #123f31;
-      filter: drop-shadow(0 16px 26px rgba(18,63,49,.20));
-      transform: scale(1.035);
-    }
-    .pyramid-note { margin-top: 14px; text-align: center; color: #6a766d; font-size: .92rem; }
-
-    .species-visual {
-      padding: 42px max(40px, calc((100vw - 1180px) / 2)) 42px 36px;
-      background:
-        radial-gradient(circle at 100% 0%, rgba(171,207,162,.24), transparent 32%),
-        linear-gradient(180deg, #f5f4ed, #f1f0ea);
-    }
+    .fact strong { display: block; color: rgba(255,255,255,.60); font-weight: 700; margin-bottom: 3px; }
     .visual-card {
-      border-radius: 18px;
-      background: #151715;
-      border: 1px solid rgba(15,31,25,.16);
       overflow: hidden;
-      box-shadow: 0 28px 80px rgba(15,31,25,.18);
+      border-radius: 16px;
+      background: #101410;
+      border: 1px solid rgba(255,255,255,.24);
+      box-shadow: 0 28px 80px rgba(0,0,0,.30);
     }
+    .splat-wrap { position: relative; }
     .viewer-top {
       position: absolute;
       z-index: 2;
       top: 16px;
       left: 16px;
-      display: flex;
-      gap: 8px;
-      align-items: center;
       border-radius: 999px;
       background: rgba(255,255,255,.92);
-      color: #17251d;
-      padding: 9px 13px;
+      color: #14231b;
+      padding: 10px 14px;
       font-size: .86rem;
-      font-weight: 800;
+      font-weight: 850;
       box-shadow: 0 12px 24px rgba(0,0,0,.14);
     }
-    .splat-wrap { position: relative; }
-    .splat-wrap iframe {
-      display: block;
-      width: 100%;
-      height: min(64vh, 680px);
-      min-height: 520px;
-      border: 0;
+    .splat-wrap iframe { display: block; width: 100%; height: 610px; border: 0; }
+    .right-col { display: grid; gap: 14px; }
+    .mini-thumb {
+      height: 154px;
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,.22);
+      background: #1b2b20;
     }
+    .mini-thumb img { width: 100%; height: 100%; object-fit: cover; display: none; filter: saturate(.86) brightness(.88); }
+    .mini-thumb.loaded img { display: block; }
+    .mini-thumb.loaded .illustration { display: none; }
+    .pyramid-box {
+      min-height: 326px;
+      display: grid;
+      align-content: center;
+      border-radius: 16px;
+      background: linear-gradient(135deg, #f4f0e7, #e9e5d9);
+      box-shadow: var(--soft);
+      padding: 36px 22px 22px;
+    }
+    .pyramid {
+      display: grid;
+      gap: 12px;
+      justify-items: center;
+    }
+    .pyramid-part {
+      opacity: .34;
+      background: #d5d0c5;
+      height: 64px;
+      transition: .18s ease;
+    }
+    .pyramid-part.top { width: 84px; clip-path: polygon(50% 0, 100% 100%, 0 100%); background: #123f31; }
+    .pyramid-part.mid { width: 168px; clip-path: polygon(25% 0, 75% 0, 100% 100%, 0 100%); background: #aeb8aa; }
+    .pyramid-part.base { width: 252px; clip-path: polygon(17% 0, 83% 0, 100% 100%, 0 100%); background: #d4cec2; }
+    .pyramid-part.active { opacity: 1; background: #123f31; filter: drop-shadow(0 14px 24px rgba(18,63,49,.24)); transform: scale(1.035); }
+    .pyramid-note { margin-top: 16px; text-align: center; color: #6b746d; font-size: .88rem; }
     .species-bottom {
+      grid-column: 2 / 4;
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 22px;
-      margin-top: 22px;
+      gap: 20px;
+      margin-top: 8px;
     }
     .white-card {
-      border: 1px solid var(--dark-line);
-      border-radius: 22px;
-      background: rgba(255,255,255,.76);
-      padding: 24px;
-      box-shadow: var(--soft-shadow);
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 16px;
+      background: rgba(255,255,255,.90);
+      color: var(--ink);
+      padding: 22px;
+      box-shadow: var(--soft);
     }
-    .card-title { font-weight: 830; margin-bottom: 12px; color: #1a2b22; }
+    .card-title { font-weight: 850; margin-bottom: 12px; }
     .white-card p { color: #4c5a51; line-height: 1.65; }
     .map-placeholder {
-      height: 180px;
-      margin-top: 18px;
-      border-radius: 18px;
-      padding: 16px;
+      height: 170px;
+      margin-top: 16px;
+      border-radius: 14px;
+      padding: 14px;
       color: #607068;
       background:
         radial-gradient(circle at 45% 40%, rgba(18,63,49,.30), transparent 9%),
         radial-gradient(circle at 52% 58%, rgba(18,63,49,.22), transparent 11%),
-        radial-gradient(circle at 58% 32%, rgba(18,63,49,.16), transparent 8%),
         linear-gradient(135deg, rgba(255,255,255,.8), rgba(225,228,216,.8));
-      border: 1px solid var(--dark-line);
+      border: 1px solid rgba(15,31,25,.12);
     }
     .look-list { display: grid; gap: 10px; padding: 0; margin: 0; list-style: none; }
     .look-list li { display: flex; gap: 10px; color: #4c5a51; line-height: 1.45; }
     .dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 8px; background: #8ee4bb; flex: 0 0 auto; }
     .dot.yellow { background: #f5d77a; }
 
-    .thumb-strip {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 12px;
-      margin-top: 14px;
-      padding: 12px;
-      border-radius: 18px;
-      background: rgba(255,255,255,.58);
-      border: 1px solid var(--dark-line);
-    }
-    .mini-thumb {
-      height: 72px;
-      border-radius: 12px;
-      overflow: hidden;
-      background: #dfe8dc;
-    }
-    .mini-thumb img { width: 100%; height: 100%; object-fit: cover; display: none; }
-    .mini-thumb.loaded img { display: block; }
-    .mini-thumb .illustration { height: 100%; }
-
-    @media (max-width: 1050px) {
-      .gallery { grid-template-columns: repeat(2, 1fr); }
-      .gallery-head { grid-template-columns: 1fr; }
-      .species-layout { grid-template-columns: 1fr; }
-      .species-info, .species-visual { padding: 36px 24px; }
-      .splat-wrap iframe { height: 560px; min-height: 440px; }
-      .species-bottom { grid-template-columns: 1fr; }
+    @media (max-width: 1100px) {
+      .gallery { grid-template-columns: repeat(3, 1fr); }
+      .search-row { grid-template-columns: 1fr; }
+      .species-layout { grid-template-columns: 1fr; width: min(760px, calc(100% - 32px)); }
+      .right-col { grid-template-columns: repeat(3, 1fr); }
+      .pyramid-box { grid-column: 1 / -1; }
+      .species-bottom { grid-column: auto; grid-template-columns: 1fr; }
     }
     @media (max-width: 680px) {
       .wrap { width: min(100% - 30px, 1180px); }
       .nav { display: none; }
-      .forest-panel { min-height: 100vh; }
       .gallery { grid-template-columns: 1fr; }
       .filters { overflow-x: auto; flex-wrap: nowrap; padding-bottom: 4px; }
       .filter-chip { white-space: nowrap; }
-      .splat-wrap iframe { height: 480px; min-height: 420px; }
-      .thumb-strip { grid-template-columns: repeat(3, 1fr); }
+      .right-col { grid-template-columns: 1fr; }
+      .splat-wrap iframe { height: 460px; }
     }
   </style>
 </head>
 <body>
-  <div class="page">
-    <section id="gallery-page">
-      <div class="forest-panel">
-        <div class="forest-content">
-          <header class="wrap topbar">
-            <button class="brand" type="button" onclick="showGallery()" aria-label="Gå till startsidan">
-              <span class="brand-mark" aria-hidden="true">♧</span>
-              <span>
-                <span class="brand-title">Digital flora</span>
-                <span class="brand-sub">3D-arter, ekologi och utbredning</span>
-              </span>
-            </button>
-            <nav class="nav" aria-label="Huvudmeny">
-              <a class="active" href="#gallery-page">Artgalleri</a>
-              <a href="#om-projektet">Om projektet</a>
-              <span class="info-dot">i</span>
-            </nav>
-          </header>
+  <section id="gallery-page">
+    <div class="forest">
+      <div class="forest-inner">
+        <header class="wrap topbar">
+          <button class="brand" type="button" onclick="showGallery()">
+            <span class="brand-mark">♧</span>
+            <span><span class="brand-title">Digital flora</span><span class="brand-sub">3D-arter, ekologi och utbredning</span></span>
+          </button>
+          <nav class="nav">
+            <a class="active" href="#gallery-page">Artgalleri</a>
+            <a href="#om-projektet">Om projektet</a>
+            <span class="info-dot">i</span>
+          </nav>
+        </header>
 
-          <section class="wrap gallery-head">
-            <div class="gallery-tools">
-              <h1>Artgalleri</h1>
-              <div class="search-wrap">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="m16.5 16.5 4 4"></path></svg>
-                <input id="search" class="search-input" placeholder="Sök på svenskt eller vetenskapligt namn…" oninput="renderGallery()" />
-              </div>
+        <main class="wrap gallery-hero">
+          <h1>Artgalleri</h1>
+          <div class="search-row">
+            <div class="search-wrap">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="m16.5 16.5 4 4"></path></svg>
+              <input id="search" class="search-input" placeholder="Sök på svenskt eller vetenskapligt namn…" oninput="renderGallery()" />
             </div>
-            <div>
-              <div id="filters" class="filters"></div>
-              <button id="clear-filters" class="clear-btn" type="button" onclick="clearFilters()" hidden>Rensa filter ↻</button>
-            </div>
-          </section>
-
-          <section class="wrap">
-            <p id="count" class="gallery-count"></p>
-            <div id="gallery" class="gallery"></div>
-            <div id="empty" class="empty" hidden>Inga arter matchade sökningen. Testa att ta bort någon flagga eller sök på “guckusko”, “tallticka”, “orkidé” eller “svamp”.</div>
-          </section>
-        </div>
+            <div id="filters" class="filters"></div>
+          </div>
+          <button id="clear-filters" class="clear-btn" type="button" onclick="clearFilters()" hidden>Rensa filter ↻</button>
+          <p id="count" class="gallery-count"></p>
+          <div id="gallery" class="gallery"></div>
+          <div id="empty" class="empty" hidden>Inga arter matchade sökningen.</div>
+        </main>
       </div>
-      <section id="om-projektet" class="wrap" style="padding: 44px 0 60px; color:#4c5a51;">
-        <h2 style="font-family: Georgia, 'Times New Roman', serif; font-size: 2.4rem; font-weight: 500; margin: 0 0 12px; color:#173527;">Om projektet</h2>
-        <p style="max-width: 760px; line-height: 1.7;">En digital flora där klassisk artkunskap kombineras med interaktiva 3D-modeller. Galleriet använder lätta artbilder, medan artsidorna visar inbäddade gaussian splats.</p>
-      </section>
+    </div>
+    <section id="om-projektet" class="wrap" style="padding:44px 0 60px; color:#dfe8df; background:#102119;">
+      <h2 style="font-family:Georgia,'Times New Roman',serif;font-size:2.4rem;font-weight:500;margin:0 0 12px;color:#fffaf0;">Om projektet</h2>
+      <p style="max-width:760px;line-height:1.7;color:rgba(255,255,255,.74);">En digital flora där klassisk artkunskap kombineras med interaktiva 3D-modeller. Galleriet använder lätta artbilder, medan artsidorna visar inbäddade gaussian splats.</p>
     </section>
+  </section>
 
-    <section id="species-page" class="species-page"></section>
-  </div>
+  <section id="species-page"></section>
 
   <script>
     const species = [
@@ -569,21 +520,12 @@
     const selectedFlags = new Set(["Alla"]);
     const allFlags = ["Alla", "Växter", "Svampar", "Orkidéer", "Fridlyst", "Signalart", "Tall", "Vedlevande"];
 
-    console.assert(species.length >= 2, "Minst två arter ska finnas.");
-    console.assert(species.every(item => item.viewerUrl && item.latin && item.signalLevel), "Alla arter ska ha viewerUrl, latin och signalLevel.");
-
     function escapeHtml(value) {
-      return String(value)
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
+      return String(value).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;");
     }
 
     function renderFilters() {
-      const container = document.getElementById("filters");
-      container.innerHTML = allFlags.map(flag => `
+      document.getElementById("filters").innerHTML = allFlags.map(flag => `
         <button type="button" class="filter-chip ${selectedFlags.has(flag) ? "active" : ""}" onclick="toggleFlag('${escapeHtml(flag)}')">${escapeHtml(flag)}</button>
       `).join("");
       document.getElementById("clear-filters").hidden = selectedFlags.size === 0 || (selectedFlags.size === 1 && selectedFlags.has("Alla"));
@@ -591,31 +533,23 @@
 
     function toggleFlag(flag) {
       if (flag === "Alla") {
-        selectedFlags.clear();
-        selectedFlags.add("Alla");
+        selectedFlags.clear(); selectedFlags.add("Alla");
       } else {
         selectedFlags.delete("Alla");
-        if (selectedFlags.has(flag)) selectedFlags.delete(flag);
-        else selectedFlags.add(flag);
+        selectedFlags.has(flag) ? selectedFlags.delete(flag) : selectedFlags.add(flag);
         if (selectedFlags.size === 0) selectedFlags.add("Alla");
       }
-      renderFilters();
-      renderGallery();
+      renderFilters(); renderGallery();
     }
 
     function clearFilters() {
-      selectedFlags.clear();
-      selectedFlags.add("Alla");
-      renderFilters();
-      renderGallery();
+      selectedFlags.clear(); selectedFlags.add("Alla"); renderFilters(); renderGallery();
     }
 
     function matches(item, query) {
       const text = `${item.name} ${item.latin} ${item.group} ${item.subgroup} ${item.status} ${item.flags.join(" ")}`.toLowerCase();
-      const matchesQuery = !query || text.includes(query);
       const activeFlags = [...selectedFlags].filter(flag => flag !== "Alla");
-      const matchesFlags = activeFlags.length === 0 || activeFlags.every(flag => item.flags.includes(flag));
-      return matchesQuery && matchesFlags;
+      return (!query || text.includes(query)) && (activeFlags.length === 0 || activeFlags.every(flag => item.flags.includes(flag)));
     }
 
     function renderGallery() {
@@ -641,34 +575,23 @@
     }
 
     function galleryPreviewHtml(item) {
-      return `
-        <div class="taxon-thumb" data-photo-for="${escapeHtml(item.id)}" aria-label="Bild av ${escapeHtml(item.name)}">
-          <img alt="${escapeHtml(item.name)}" loading="lazy" />
-          <div class="fallback-illustration">
-            ${illustrationHtml(item)}
-          </div>
-        </div>
-      `;
+      return `<div class="taxon-thumb" data-photo-for="${escapeHtml(item.id)}"><img alt="${escapeHtml(item.name)}" loading="lazy" /><div class="fallback-illustration">${illustrationHtml(item)}</div></div>`;
     }
 
-    async function fetchINaturalistPhoto(item) {
-      const cacheKey = `inat-photo:${item.latin}`;
-      const cached = localStorage.getItem(cacheKey);
-      if (cached) return cached === "NONE" ? null : cached;
+    async function fetchINaturalistPhotos(item, count = 5) {
       const endpoint = `https://api.inaturalist.org/v1/taxa?q=${encodeURIComponent(item.latin)}&rank=species&per_page=5`;
       try {
-        const response = await fetch(endpoint);
-        if (!response.ok) throw new Error(`iNaturalist svarade ${response.status}`);
+        const response = await fetch(endpoint, { cache: "no-store" });
+        if (!response.ok) throw new Error(response.status);
         const data = await response.json();
         const results = Array.isArray(data.results) ? data.results : [];
-        const exact = results.find(taxon => String(taxon.name).toLowerCase() === item.latin.toLowerCase()) || results[0];
+        const exact = results.find(t => String(t.name).toLowerCase() === item.latin.toLowerCase()) || results[0];
         const photo = exact && exact.default_photo;
         const url = photo && (photo.medium_url || photo.square_url || photo.url);
-        localStorage.setItem(cacheKey, url || "NONE");
-        return url || null;
-      } catch (error) {
-        console.warn("Kunde inte hämta artbild från iNaturalist", item.latin, error);
-        return null;
+        return url ? Array(count).fill(url) : [];
+      } catch (e) {
+        console.warn("Kunde inte hämta artbild från iNaturalist", item.latin, e);
+        return [];
       }
     }
 
@@ -677,20 +600,16 @@
         const thumb = document.querySelector(`[data-photo-for="${CSS.escape(item.id)}"]`);
         if (!thumb || thumb.classList.contains("loaded")) continue;
         const img = thumb.querySelector("img");
-        const photoUrl = await fetchINaturalistPhoto(item);
-        if (!photoUrl || !img) continue;
-        img.src = photoUrl;
+        const photos = await fetchINaturalistPhotos(item, 1);
+        if (!photos[0] || !img) continue;
+        img.src = photos[0];
         img.onload = () => thumb.classList.add("loaded");
       }
     }
 
-    function illustrationHtml(item, large = false) {
+    function illustrationHtml(item) {
       const symbolClass = item.id === "guckusko" ? "guckusko-symbol" : "tallticka-symbol";
-      return `
-        <div class="illustration ${large ? "large" : ""} ${item.illustrationClass}" role="img" aria-label="Illustration av ${escapeHtml(item.name)}">
-          <div class="${symbolClass}"></div>
-        </div>
-      `;
+      return `<div class="illustration ${item.illustrationClass}"><div class="${symbolClass}"></div></div>`;
     }
 
     function showSpecies(id) {
@@ -715,82 +634,51 @@
     }
 
     function pyramidHtml(item) {
-      return `
-        <div class="pyramid" aria-label="Signalvärdespyramid">
-          <div class="pyramid-part top ${item.signalLevel === 3 ? "active" : ""}"></div>
-          <div class="pyramid-part mid ${item.signalLevel === 2 ? "active" : ""}"></div>
-          <div class="pyramid-part base ${item.signalLevel === 1 ? "active" : ""}"></div>
-        </div>
-        <div class="pyramid-note">Utifrån Nitare, 2020.</div>
-      `;
+      return `<div class="pyramid-box"><div class="pyramid">
+        <div class="pyramid-part top ${item.signalLevel === 3 ? "active" : ""}"></div>
+        <div class="pyramid-part mid ${item.signalLevel === 2 ? "active" : ""}"></div>
+        <div class="pyramid-part base ${item.signalLevel === 1 ? "active" : ""}"></div>
+      </div><div class="pyramid-note">Utifrån Nitare, 2020.</div></div>`;
     }
 
     function speciesPageHtml(item) {
-      return `
-        <div class="species-layout">
-          <aside class="species-info">
-            <button class="back-btn" type="button" onclick="showGallery()">← Tillbaka till galleri</button>
-            <h1 class="species-title">${escapeHtml(item.name)}</h1>
-            <p class="latin">${escapeHtml(item.latin)}</p>
-            <div class="species-tags">
-              <span class="tag ${item.accent}">${escapeHtml(item.subgroup)}</span>
-              <span class="tag">${escapeHtml(item.status.split(" i ")[0])}</span>
-              <span class="tag">${escapeHtml(item.group)}</span>
-            </div>
-            <p class="species-desc">${escapeHtml(item.description)} ${escapeHtml(item.ecology)}</p>
-
-            <div class="facts">
-              <div class="fact"><span class="fact-icon">♧</span><div><strong>Grupp</strong>${escapeHtml(item.group)}</div></div>
-              <div class="fact"><span class="fact-icon">✽</span><div><strong>Familj</strong>${escapeHtml(item.family)}</div></div>
-              <div class="fact"><span class="fact-icon">☼</span><div><strong>Blomningstid</strong>${escapeHtml(item.flowering)}</div></div>
-              <div class="fact"><span class="fact-icon">♧</span><div><strong>Livsmiljö</strong>${escapeHtml(item.habitat)}</div></div>
-              <div class="fact"><span class="fact-icon">↓</span><div><strong>Status</strong>${escapeHtml(item.status)}</div></div>
-            </div>
-
-            <div class="pyramid-card">
-              ${pyramidHtml(item)}
-            </div>
-          </aside>
-
-          <main class="species-visual">
-            <div class="visual-card splat-wrap">
-              <div class="viewer-top">◈ 3D (Gaussian Splat)</div>
-              <iframe title="Interaktiv 3D-modell av ${escapeHtml(item.name)}" allow="fullscreen; xr-spatial-tracking" src="${escapeHtml(item.viewerUrl)}"></iframe>
-            </div>
-            <div id="species-thumbs" class="thumb-strip">
-              ${Array.from({ length: 5 }).map((_, index) => `
-                <div class="mini-thumb" data-mini-photo="${index}">
-                  <img alt="${escapeHtml(item.name)} bild ${index + 1}" loading="lazy" />
-                  ${illustrationHtml(item)}
-                </div>
-              `).join("")}
-            </div>
-
-            <div class="species-bottom">
-              <article class="white-card">
-                <div class="card-title">Utbredning</div>
-                <p>${escapeHtml(item.distribution)}</p>
-                <div class="map-placeholder">Här kan en fyndkarta eller Artportalen/GBIF-modul kopplas in senare.</div>
-              </article>
-              <article class="white-card">
-                <div class="card-title">Kännetecken</div>
-                <ul class="look-list">
-                  ${item.lookFor.map(point => `<li><span class="dot ${item.accent === "yellow" ? "yellow" : ""}"></span>${escapeHtml(point)}</li>`).join("")}
-                </ul>
-              </article>
-            </div>
-          </main>
-        </div>
-      `;
+      return `<div class="species-layout">
+        <aside>
+          <button class="back-btn" type="button" onclick="showGallery()">← Tillbaka till galleri</button>
+          <h1 class="species-title">${escapeHtml(item.name)}</h1>
+          <p class="species-latin">${escapeHtml(item.latin)}</p>
+          <div class="species-tags"><span class="tag ${item.accent}">${escapeHtml(item.subgroup)}</span><span class="tag">${escapeHtml(item.status.split(" i ")[0])}</span><span class="tag">${escapeHtml(item.group)}</span></div>
+          <p class="species-desc">${escapeHtml(item.description)} ${escapeHtml(item.ecology)}</p>
+          <div class="facts">
+            <div class="fact"><span class="fact-icon">♧</span><div><strong>Grupp</strong>${escapeHtml(item.group)}</div></div>
+            <div class="fact"><span class="fact-icon">✽</span><div><strong>Familj</strong>${escapeHtml(item.family)}</div></div>
+            <div class="fact"><span class="fact-icon">☼</span><div><strong>Blomningstid</strong>${escapeHtml(item.flowering)}</div></div>
+            <div class="fact"><span class="fact-icon">♧</span><div><strong>Livsmiljö</strong>${escapeHtml(item.habitat)}</div></div>
+            <div class="fact"><span class="fact-icon">↓</span><div><strong>Status</strong>${escapeHtml(item.status)}</div></div>
+          </div>
+        </aside>
+        <main>
+          <div class="visual-card splat-wrap"><div class="viewer-top">◈ 3D (Gaussian Splat)</div><iframe title="Interaktiv 3D-modell av ${escapeHtml(item.name)}" allow="fullscreen; xr-spatial-tracking" src="${escapeHtml(item.viewerUrl)}"></iframe></div>
+        </main>
+        <aside class="right-col">
+          <div class="mini-thumb" data-mini-photo="0"><img alt="${escapeHtml(item.name)} bild 1" />${illustrationHtml(item)}</div>
+          <div class="mini-thumb" data-mini-photo="1"><img alt="${escapeHtml(item.name)} bild 2" />${illustrationHtml(item)}</div>
+          <div class="mini-thumb" data-mini-photo="2"><img alt="${escapeHtml(item.name)} bild 3" />${illustrationHtml(item)}</div>
+          ${pyramidHtml(item)}
+        </aside>
+        <section class="species-bottom">
+          <article class="white-card"><div class="card-title">Utbredning</div><p>${escapeHtml(item.distribution)}</p><div class="map-placeholder">Här kan en fyndkarta eller Artportalen/GBIF-modul kopplas in senare.</div></article>
+          <article class="white-card"><div class="card-title">Kännetecken</div><ul class="look-list">${item.lookFor.map(point => `<li><span class="dot ${item.accent === "yellow" ? "yellow" : ""}"></span>${escapeHtml(point)}</li>`).join("")}</ul></article>
+        </section>
+      </div>`;
     }
 
     async function loadSpeciesPhotos(item) {
-      const photoUrl = await fetchINaturalistPhoto(item);
-      if (!photoUrl) return;
-      document.querySelectorAll("[data-mini-photo]").forEach((thumb) => {
+      const photos = await fetchINaturalistPhotos(item, 3);
+      document.querySelectorAll("[data-mini-photo]").forEach((thumb, index) => {
         const img = thumb.querySelector("img");
-        if (!img) return;
-        img.src = photoUrl;
+        if (!photos[index] || !img) return;
+        img.src = photos[index];
         img.onload = () => thumb.classList.add("loaded");
       });
     }
