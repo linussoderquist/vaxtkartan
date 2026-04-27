@@ -8,53 +8,52 @@
     :root {
       --ink: #10231b;
       --cream: #f4f1e8;
-      --forest: #0b1913;
-      --forest2: #172d22;
+      --forest: #07120d;
+      --forest2: #14291f;
       --line: rgba(255,255,255,.24);
-      --shadow: 0 24px 80px rgba(0,0,0,.28);
-      --soft: 0 18px 50px rgba(10,24,17,.14);
+      --shadow: 0 24px 80px rgba(0,0,0,.32);
+      --soft: 0 18px 50px rgba(10,24,17,.16);
+      --glass: rgba(18, 35, 26, .64);
     }
+
     * { box-sizing: border-box; }
     html { scroll-behavior: smooth; }
     body {
       margin: 0;
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      color: var(--ink);
-      background: #102119;
+      color: white;
+      background: var(--forest);
     }
     button, input { font: inherit; }
     button { cursor: pointer; }
-    .wrap { width: min(1180px, calc(100% - 48px)); margin: 0 auto; }
+    .wrap { width: min(1220px, calc(100% - 56px)); margin: 0 auto; }
 
-    /* GALLERY */
-    #gallery-page { min-height: 100vh; }
-    .forest {
-      min-height: 760px;
-      color: white;
-      position: relative;
-      overflow: hidden;
+    .site-bg {
+      min-height: 100vh;
       background:
-        linear-gradient(180deg, rgba(5,15,10,.18), rgba(5,15,10,.78)),
-        radial-gradient(circle at 28% 6%, rgba(230,238,221,.28), transparent 27%),
-        radial-gradient(circle at 74% 28%, rgba(120,150,110,.18), transparent 30%),
-        url("assets/scandinavian-wet-forest.jpg") center/cover no-repeat,
-        linear-gradient(135deg, #16261c, #2e4535 45%, #08120d);
+        linear-gradient(180deg, rgba(6,16,11,.12), rgba(6,16,11,.86) 72%),
+        radial-gradient(circle at 35% 3%, rgba(236,245,232,.28), transparent 28%),
+        radial-gradient(circle at 80% 24%, rgba(110,140,104,.20), transparent 32%),
+        url("assets/scandinavian-wet-forest.jpg") center top / cover fixed no-repeat,
+        linear-gradient(135deg, #182a1f, #07120d);
     }
-    .forest::after {
+    .site-bg::before {
       content: "";
-      position: absolute;
+      position: fixed;
       inset: 0;
-      background: rgba(5,16,11,.20);
       pointer-events: none;
+      background: rgba(4, 14, 9, .28);
+      z-index: 0;
     }
-    .forest-inner { position: relative; z-index: 1; padding: 32px 0 58px; }
+    .site-content { position: relative; z-index: 1; }
+
     .topbar {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 22px;
-      padding-bottom: 24px;
-      border-bottom: 1px solid rgba(255,255,255,.18);
+      padding: 32px 0 26px;
+      border-bottom: 1px solid rgba(255,255,255,.17);
     }
     .brand {
       display: flex;
@@ -72,13 +71,13 @@
       border-radius: 50%;
       display: grid;
       place-items: center;
-      border: 1px solid rgba(255,255,255,.45);
-      background: rgba(255,255,255,.10);
-      backdrop-filter: blur(14px);
-      font-size: 1.2rem;
+      border: 1px solid rgba(255,255,255,.48);
+      background: rgba(255,255,255,.09);
+      backdrop-filter: blur(16px);
+      font-size: 1.22rem;
     }
     .brand-title { display: block; font-weight: 800; font-size: 1.12rem; }
-    .brand-sub { display: block; color: rgba(255,255,255,.74); font-size: .9rem; margin-top: 2px; }
+    .brand-sub { display: block; color: rgba(255,255,255,.76); font-size: .92rem; margin-top: 2px; }
     .nav { display: flex; align-items: center; gap: 26px; }
     .nav a, .nav button {
       color: rgba(255,255,255,.86);
@@ -97,19 +96,23 @@
       place-items: center;
       border: 1px solid rgba(255,255,255,.42);
     }
-    .gallery-hero { padding-top: 58px; }
+
+    /* GALLERY */
+    #gallery-page { min-height: 100vh; }
+    .gallery-hero { padding: 58px 0 68px; }
     h1 {
       margin: 0;
       font-family: Georgia, "Times New Roman", serif;
       font-weight: 500;
-      letter-spacing: -.05em;
-      font-size: clamp(3.4rem, 7vw, 5.7rem);
+      letter-spacing: -.055em;
+      font-size: clamp(3.6rem, 7vw, 5.9rem);
       line-height: .95;
+      color: #fffaf0;
     }
     .search-row {
       margin-top: 24px;
       display: grid;
-      grid-template-columns: 390px 1fr;
+      grid-template-columns: minmax(280px, 410px) 1fr;
       gap: 34px;
       align-items: start;
     }
@@ -119,39 +122,42 @@
       left: 18px;
       top: 50%;
       transform: translateY(-50%);
-      color: rgba(255,255,255,.74);
+      color: rgba(255,255,255,.76);
     }
     .search-input {
       width: 100%;
-      border: 1px solid rgba(255,255,255,.30);
+      border: 1px solid rgba(255,255,255,.32);
       border-radius: 999px;
       padding: 16px 18px 16px 50px;
       outline: none;
       color: white;
-      background: rgba(255,255,255,.14);
-      backdrop-filter: blur(18px);
+      background: rgba(255,255,255,.13);
+      backdrop-filter: blur(20px);
       box-shadow: 0 14px 30px rgba(0,0,0,.18);
     }
     .search-input::placeholder { color: rgba(255,255,255,.78); }
     .filters { display: flex; flex-wrap: wrap; gap: 12px; }
     .filter-chip {
-      border: 1px solid rgba(255,255,255,.22);
+      border: 1px solid rgba(255,255,255,.23);
       color: white;
-      background: rgba(255,255,255,.15);
+      background: rgba(255,255,255,.14);
       border-radius: 999px;
       padding: 12px 21px;
       backdrop-filter: blur(18px);
       box-shadow: 0 12px 28px rgba(0,0,0,.14);
+      transition: .18s ease;
     }
-    .filter-chip.active { background: rgba(255,255,255,.92); color: #13231b; }
+    .filter-chip:hover { background: rgba(255,255,255,.22); transform: translateY(-1px); }
+    .filter-chip.active { background: rgba(255,255,255,.94); color: #13231b; }
     .clear-btn {
       border: 0;
       background: transparent;
       color: rgba(255,255,255,.86);
       font-weight: 700;
-      margin-left: auto;
+      margin: 16px 0 0 auto;
+      display: block;
     }
-    .gallery-count { margin: 34px 0 18px; color: rgba(255,255,255,.70); }
+    .gallery-count { margin: 34px 0 18px; color: rgba(255,255,255,.72); }
     .gallery {
       display: grid;
       grid-template-columns: repeat(5, minmax(170px, 1fr));
@@ -159,9 +165,9 @@
     }
     .card {
       overflow: hidden;
-      border: 1px solid rgba(255,255,255,.26);
+      border: 1px solid rgba(255,255,255,.28);
       border-radius: 16px;
-      background: rgba(17,32,24,.62);
+      background: rgba(17,32,24,.64);
       color: white;
       padding: 0;
       text-align: left;
@@ -169,26 +175,33 @@
       backdrop-filter: blur(18px);
       transition: .18s ease;
     }
-    .card:hover { transform: translateY(-5px); background: rgba(22,41,30,.72); }
+    .card:hover { transform: translateY(-5px); background: rgba(22,41,30,.74); }
     .taxon-thumb {
-      height: 230px;
+      height: 250px;
       overflow: hidden;
       background: linear-gradient(135deg, #1c2f23, #0d1912);
       position: relative;
+    }
+    .taxon-thumb::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, transparent 55%, rgba(6,14,10,.40));
+      pointer-events: none;
     }
     .taxon-thumb img {
       display: none;
       width: 100%;
       height: 100%;
       object-fit: cover;
-      filter: saturate(.86) contrast(1.02) brightness(.88);
+      filter: saturate(.88) contrast(1.04) brightness(.88);
     }
     .taxon-thumb.loaded img { display: block; }
     .taxon-thumb.loaded .fallback-illustration { display: none; }
     .fallback-illustration { position: absolute; inset: 0; }
     .card-body {
       padding: 18px;
-      background: linear-gradient(180deg, rgba(17,31,23,.78), rgba(10,21,15,.92));
+      background: linear-gradient(180deg, rgba(17,31,23,.78), rgba(10,21,15,.93));
     }
     .card h3 {
       margin: 0;
@@ -198,7 +211,7 @@
       letter-spacing: -.035em;
       color: #fffaf0;
     }
-    .latin { margin: 5px 0 0; font-style: italic; color: rgba(255,255,255,.74); }
+    .latin { margin: 5px 0 0; font-style: italic; color: rgba(255,255,255,.75); }
     .tag-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 14px; }
     .tag {
       border-radius: 999px;
@@ -209,8 +222,8 @@
       background: rgba(255,255,255,.16);
       border: 1px solid rgba(255,255,255,.10);
     }
-    .tag.yellow { background: rgba(245,215,122,.80); color: #3c2a08; }
-    .tag.green { background: rgba(99,207,155,.55); color: white; }
+    .tag.yellow { background: rgba(245,215,122,.82); color: #3c2a08; }
+    .tag.green { background: rgba(99,207,155,.58); color: white; }
     .open-arrow {
       margin-left: auto;
       width: 28px;
@@ -262,21 +275,20 @@
     }
 
     /* SPECIES PAGE */
-    #species-page {
-      display: none;
+    #species-page { display: none; min-height: 100vh; }
+    .species-shell {
       min-height: 100vh;
-      color: white;
       background:
-        radial-gradient(circle at 0% 0%, rgba(120,150,110,.18), transparent 28%),
-        linear-gradient(135deg, #1a3024, #0d1d15 55%, #07120d);
+        linear-gradient(180deg, rgba(7,18,13,.88), rgba(7,18,13,.95)),
+        url("assets/scandinavian-wet-forest.jpg") center top / cover fixed no-repeat,
+        #07120d;
+      padding: 42px 0 44px;
     }
     .species-layout {
-      width: min(1180px, calc(100% - 48px));
-      min-height: 100vh;
+      width: min(1280px, calc(100% - 56px));
       margin: 0 auto;
-      padding: 46px 0;
       display: grid;
-      grid-template-columns: 250px minmax(410px, 1fr) 300px;
+      grid-template-columns: minmax(300px, 340px) minmax(460px, 1fr) 300px;
       gap: 24px;
       align-items: start;
     }
@@ -284,7 +296,7 @@
       display: inline-flex;
       align-items: center;
       gap: 9px;
-      margin-bottom: 46px;
+      margin-bottom: 48px;
       padding: 0;
       border: 0;
       background: transparent;
@@ -294,15 +306,18 @@
     .species-title {
       margin: 0;
       font-family: Georgia, "Times New Roman", serif;
-      font-size: clamp(3.1rem, 5vw, 4.8rem);
+      font-size: clamp(3rem, 4.2vw, 4.15rem);
       font-weight: 500;
       line-height: .96;
       letter-spacing: -.05em;
       color: #fffaf0;
+      max-width: 100%;
+      overflow-wrap: normal;
+      white-space: normal;
     }
-    .species-latin { margin: 12px 0 0; color: rgba(255,255,255,.72); font-style: italic; font-size: 1.25rem; }
-    .species-tags { display: flex; flex-wrap: wrap; gap: 9px; margin: 24px 0 28px; }
-    .species-desc { color: rgba(255,255,255,.78); line-height: 1.72; font-size: .98rem; }
+    .species-latin { margin: 12px 0 0; color: rgba(255,255,255,.72); font-style: italic; font-size: 1.18rem; line-height: 1.35; }
+    .species-tags { display: flex; flex-wrap: wrap; gap: 9px; margin: 24px 0 30px; }
+    .species-desc { color: rgba(255,255,255,.78); line-height: 1.72; font-size: .95rem; }
     .facts { display: grid; gap: 22px; margin-top: 38px; }
     .fact {
       display: grid;
@@ -343,20 +358,22 @@
       font-weight: 850;
       box-shadow: 0 12px 24px rgba(0,0,0,.14);
     }
-    .splat-wrap iframe { display: block; width: 100%; height: 610px; border: 0; }
+    .splat-wrap iframe { display: block; width: 100%; height: 620px; border: 0; }
     .right-col { display: grid; gap: 14px; }
     .mini-thumb {
-      height: 154px;
+      height: 156px;
       border-radius: 14px;
       overflow: hidden;
       border: 1px solid rgba(255,255,255,.22);
       background: #1b2b20;
+      position: relative;
+      box-shadow: 0 14px 36px rgba(0,0,0,.18);
     }
-    .mini-thumb img { width: 100%; height: 100%; object-fit: cover; display: none; filter: saturate(.86) brightness(.88); }
+    .mini-thumb img { width: 100%; height: 100%; object-fit: cover; display: none; filter: saturate(.88) brightness(.90); }
     .mini-thumb.loaded img { display: block; }
     .mini-thumb.loaded .illustration { display: none; }
     .pyramid-box {
-      min-height: 326px;
+      min-height: 330px;
       display: grid;
       align-content: center;
       border-radius: 16px;
@@ -364,17 +381,8 @@
       box-shadow: var(--soft);
       padding: 36px 22px 22px;
     }
-    .pyramid {
-      display: grid;
-      gap: 12px;
-      justify-items: center;
-    }
-    .pyramid-part {
-      opacity: .34;
-      background: #d5d0c5;
-      height: 64px;
-      transition: .18s ease;
-    }
+    .pyramid { display: grid; gap: 12px; justify-items: center; }
+    .pyramid-part { opacity: .34; background: #d5d0c5; height: 64px; transition: .18s ease; }
     .pyramid-part.top { width: 84px; clip-path: polygon(50% 0, 100% 100%, 0 100%); background: #aeb8aa; }
     .pyramid-part.mid { width: 168px; clip-path: polygon(25% 0, 75% 0, 100% 100%, 0 100%); background: #aeb8aa; }
     .pyramid-part.base { width: 252px; clip-path: polygon(17% 0, 83% 0, 100% 100%, 0 100%); background: #aeb8aa; }
@@ -390,7 +398,7 @@
     .white-card {
       border: 1px solid rgba(255,255,255,.18);
       border-radius: 16px;
-      background: rgba(255,255,255,.90);
+      background: rgba(255,255,255,.92);
       color: var(--ink);
       padding: 22px;
       box-shadow: var(--soft);
@@ -414,10 +422,23 @@
     .dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 8px; background: #8ee4bb; flex: 0 0 auto; }
     .dot.yellow { background: #f5d77a; }
 
-    @media (max-width: 1100px) {
+    #om-projektet {
+      padding: 44px 0 60px;
+      color: rgba(255,255,255,.78);
+    }
+    #om-projektet h2 {
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 2.4rem;
+      font-weight: 500;
+      margin: 0 0 12px;
+      color: #fffaf0;
+    }
+    #om-projektet p { max-width: 760px; line-height: 1.7; }
+
+    @media (max-width: 1180px) {
       .gallery { grid-template-columns: repeat(3, 1fr); }
       .search-row { grid-template-columns: 1fr; }
-      .species-layout { grid-template-columns: 1fr; width: min(760px, calc(100% - 32px)); }
+      .species-layout { grid-template-columns: 1fr; width: min(780px, calc(100% - 32px)); }
       .right-col { grid-template-columns: repeat(3, 1fr); }
       .pyramid-box { grid-column: 1 / -1; }
       .species-bottom { grid-column: auto; grid-template-columns: 1fr; }
@@ -434,9 +455,9 @@
   </style>
 </head>
 <body>
-  <section id="gallery-page">
-    <div class="forest">
-      <div class="forest-inner">
+  <div class="site-bg">
+    <div class="site-content">
+      <section id="gallery-page">
         <header class="wrap topbar">
           <button class="brand" type="button" onclick="showGallery()">
             <span class="brand-mark">♧</span>
@@ -463,15 +484,16 @@
           <div id="gallery" class="gallery"></div>
           <div id="empty" class="empty" hidden>Inga arter matchade sökningen.</div>
         </main>
-      </div>
-    </div>
-    <section id="om-projektet" class="wrap" style="padding:44px 0 60px; color:#dfe8df; background:#102119;">
-      <h2 style="font-family:Georgia,'Times New Roman',serif;font-size:2.4rem;font-weight:500;margin:0 0 12px;color:#fffaf0;">Om projektet</h2>
-      <p style="max-width:760px;line-height:1.7;color:rgba(255,255,255,.74);">En digital flora där klassisk artkunskap kombineras med interaktiva 3D-modeller. Galleriet använder lätta artbilder, medan artsidorna visar inbäddade gaussian splats.</p>
-    </section>
-  </section>
 
-  <section id="species-page"></section>
+        <section id="om-projektet" class="wrap">
+          <h2>Om projektet</h2>
+          <p>En digital flora där klassisk artkunskap kombineras med interaktiva 3D-modeller. Galleriet använder lätta artbilder, medan artsidorna visar inbäddade gaussian splats.</p>
+        </section>
+      </section>
+
+      <section id="species-page"></section>
+    </div>
+  </div>
 
   <script>
     const species = [
@@ -519,6 +541,10 @@
 
     const selectedFlags = new Set(["Alla"]);
     const allFlags = ["Alla", "Växter", "Svampar", "Orkidéer", "Fridlyst", "Signalart", "Tall", "Vedlevande"];
+    const photoCache = new Map();
+
+    console.assert(species.length >= 2, "Minst två arter ska finnas.");
+    console.assert(species.every(item => item.viewerUrl && item.latin && item.signalLevel), "Alla arter ska ha viewerUrl, latin och signalLevel.");
 
     function escapeHtml(value) {
       return String(value).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;");
@@ -579,18 +605,34 @@
     }
 
     async function fetchINaturalistPhotos(item, count = 5) {
-      const endpoint = `https://api.inaturalist.org/v1/taxa?q=${encodeURIComponent(item.latin)}&rank=species&per_page=5`;
+      const cacheKey = `${item.latin}:${count}`;
+      if (photoCache.has(cacheKey)) return photoCache.get(cacheKey);
+
+      const url = `https://api.inaturalist.org/v1/observations?taxon_name=${encodeURIComponent(item.latin)}&photos=true&quality_grade=research&per_page=${Math.max(count, 8)}&order_by=votes`;
       try {
-        const response = await fetch(endpoint, { cache: "no-store" });
+        const response = await fetch(url, { cache: "no-store" });
         if (!response.ok) throw new Error(response.status);
         const data = await response.json();
-        const results = Array.isArray(data.results) ? data.results : [];
-        const exact = results.find(t => String(t.name).toLowerCase() === item.latin.toLowerCase()) || results[0];
-        const photo = exact && exact.default_photo;
-        const url = photo && (photo.medium_url || photo.square_url || photo.url);
-        return url ? Array(count).fill(url) : [];
-      } catch (e) {
-        console.warn("Kunde inte hämta artbild från iNaturalist", item.latin, e);
+        const observations = Array.isArray(data.results) ? data.results : [];
+        const urls = [];
+
+        for (const obs of observations) {
+          const photos = Array.isArray(obs.photos) ? obs.photos : [];
+          for (const photo of photos) {
+            let photoUrl = photo.url || photo.medium_url || photo.square_url;
+            if (!photoUrl) continue;
+            photoUrl = photoUrl.replace("square.", "medium.").replace("small.", "medium.");
+            urls.push(photoUrl);
+            if (urls.length >= count) break;
+          }
+          if (urls.length >= count) break;
+        }
+
+        photoCache.set(cacheKey, urls);
+        return urls;
+      } catch (error) {
+        console.warn("Kunde inte hämta artbilder från iNaturalist", item.latin, error);
+        photoCache.set(cacheKey, []);
         return [];
       }
     }
@@ -642,7 +684,7 @@
     }
 
     function speciesPageHtml(item) {
-      return `<div class="species-layout">
+      return `<div class="species-shell"><div class="species-layout">
         <aside>
           <button class="back-btn" type="button" onclick="showGallery()">← Tillbaka till galleri</button>
           <h1 class="species-title">${escapeHtml(item.name)}</h1>
@@ -658,7 +700,7 @@
           </div>
         </aside>
         <main>
-          <div class="visual-card splat-wrap"><iframe title="Interaktiv 3D-modell av ${escapeHtml(item.name)}" allow="fullscreen; xr-spatial-tracking" src="${escapeHtml(item.viewerUrl)}"></iframe></div>
+          <div class="visual-card splat-wrap"><div class="viewer-top">◈ 3D (Gaussian Splat)</div><iframe title="Interaktiv 3D-modell av ${escapeHtml(item.name)}" allow="fullscreen; xr-spatial-tracking" src="${escapeHtml(item.viewerUrl)}"></iframe></div>
         </main>
         <aside class="right-col">
           <div class="mini-thumb" data-mini-photo="0"><img alt="${escapeHtml(item.name)} bild 1" />${illustrationHtml(item)}</div>
@@ -670,7 +712,7 @@
           <article class="white-card"><div class="card-title">Utbredning</div><p>${escapeHtml(item.distribution)}</p><div class="map-placeholder">Här kan en fyndkarta eller Artportalen/GBIF-modul kopplas in senare.</div></article>
           <article class="white-card"><div class="card-title">Kännetecken</div><ul class="look-list">${item.lookFor.map(point => `<li><span class="dot ${item.accent === "yellow" ? "yellow" : ""}"></span>${escapeHtml(point)}</li>`).join("")}</ul></article>
         </section>
-      </div>`;
+      </div></div>`;
     }
 
     async function loadSpeciesPhotos(item) {
