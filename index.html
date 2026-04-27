@@ -828,20 +828,16 @@
     }
 
     async function loadSpeciesPhotos(item) {
-      if (item.localImage) {
-        document.querySelectorAll("[data-mini-photo]").forEach((thumb) => {
-          const img = thumb.querySelector("img");
-          if (!img) return;
-          img.src = item.localImage;
-          img.onload = () => thumb.classList.add("loaded");
-        });
-        return;
-      }
       const photos = await fetchINaturalistPhotos(item, 3);
+
       document.querySelectorAll("[data-mini-photo]").forEach((thumb, index) => {
         const img = thumb.querySelector("img");
-        if (!photos[index] || !img) return;
-        img.src = photos[index];
+        if (!img) return;
+
+        const photoUrl = photos[index] || item.localImage;
+        if (!photoUrl) return;
+
+        img.src = photoUrl;
         img.onload = () => thumb.classList.add("loaded");
       });
     }
