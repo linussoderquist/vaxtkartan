@@ -244,6 +244,43 @@
     }
     .card:hover .arrow-dot { transform: translateX(4px); }
 
+    .splat-thumb {
+      position: relative;
+      height: 220px;
+      overflow: hidden;
+      border-radius: 26px;
+      background: #0c0a09;
+    }
+    .splat-thumb iframe {
+      display: block;
+      width: 100%;
+      height: 100%;
+      border: 0;
+      pointer-events: none;
+    }
+    .splat-thumb::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background:
+        linear-gradient(180deg, transparent 52%, rgba(0,0,0,.42)),
+        linear-gradient(115deg, rgba(255,255,255,.08), transparent 46%);
+    }
+    .splat-thumb-label {
+      position: absolute;
+      left: 14px;
+      bottom: 14px;
+      z-index: 2;
+      border-radius: 999px;
+      background: rgba(255,255,255,.88);
+      color: #1c1917;
+      padding: 7px 11px;
+      font-size: .78rem;
+      font-weight: 800;
+      box-shadow: 0 8px 18px rgba(0,0,0,.16);
+    }
+
     .illustration {
       position: relative;
       height: 220px;
@@ -430,6 +467,18 @@
       <div class="hero-area">
         <div class="blob blob-a"></div>
         <div class="blob blob-b"></div>
+
+        <header class="wrap topbar">
+          <button class="brand" type="button" onclick="showGallery()" aria-label="Gå till startsidan">
+            <span class="brand-mark" aria-hidden="true">☘</span>
+            <span>
+              <span class="brand-title">Digital flora</span><br />
+              <span class="brand-sub">3D-arter, ekologi och utbredning</span>
+            </span>
+          </button>
+          <span class="top-pill">⟳ Interaktiva gaussian splats</span>
+        </header>
+
         <div class="wrap hero-grid">
           <div>
             <h1>Utforska arter i 3D.</h1>
@@ -550,7 +599,7 @@
       document.getElementById("empty").hidden = filtered.length !== 0;
       document.getElementById("gallery").innerHTML = filtered.map(item => `
         <button class="card" type="button" onclick="showSpecies('${item.id}')">
-          ${illustrationHtml(item)}
+          ${galleryPreviewHtml(item)}
           <div class="card-body">
             <div class="tag-row">
               <span class="tag ${item.accent}">${escapeHtml(item.subgroup)}</span>
@@ -563,6 +612,15 @@
           </div>
         </button>
       `).join("");
+    }
+
+    function galleryPreviewHtml(item) {
+      return `
+        <div class="splat-thumb" aria-label="3D-preview av ${escapeHtml(item.name)}">
+          <iframe loading="lazy" tabindex="-1" title="3D-preview av ${escapeHtml(item.name)}" allow="fullscreen; xr-spatial-tracking" src="${escapeHtml(item.viewerUrl)}"></iframe>
+          <span class="splat-thumb-label">3D-preview</span>
+        </div>
+      `;
     }
 
     function illustrationHtml(item, large = false) {
