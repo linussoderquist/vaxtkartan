@@ -157,6 +157,70 @@
       margin: 16px 0 0 auto;
       display: block;
     }
+    .landing-value-filter {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-top: 18px;
+      color: rgba(255,255,255,.78);
+    }
+    .landing-value-filter-label {
+      font-size: .9rem;
+      font-weight: 750;
+      white-space: nowrap;
+    }
+    .mini-pyramid-filter {
+      display: grid;
+      gap: 5px;
+      justify-items: center;
+      padding: 10px 12px;
+      border: 1px solid rgba(255,255,255,.22);
+      border-radius: 18px;
+      background: rgba(255,255,255,.12);
+      backdrop-filter: blur(16px);
+      box-shadow: 0 12px 28px rgba(0,0,0,.14);
+    }
+    .mini-pyramid-filter button {
+      border: 0;
+      padding: 0;
+      opacity: .52;
+      background: #aeb8aa;
+      transition: .16s ease;
+    }
+    .mini-pyramid-filter button:hover,
+    .mini-pyramid-filter button.active {
+      opacity: 1;
+      background: #f7f6f0;
+      transform: scale(1.05);
+    }
+    .mini-pyramid-filter .mini-top {
+      width: 34px;
+      height: 25px;
+      clip-path: polygon(50% 0, 100% 100%, 0 100%);
+    }
+    .mini-pyramid-filter .mini-mid {
+      width: 66px;
+      height: 25px;
+      clip-path: polygon(25% 0, 75% 0, 100% 100%, 0 100%);
+    }
+    .mini-pyramid-filter .mini-base {
+      width: 98px;
+      height: 25px;
+      clip-path: polygon(17% 0, 83% 0, 100% 100%, 0 100%);
+    }
+    .value-reset {
+      border: 1px solid rgba(255,255,255,.22);
+      border-radius: 999px;
+      background: rgba(255,255,255,.12);
+      color: rgba(255,255,255,.86);
+      padding: 8px 12px;
+      font-size: .84rem;
+      font-weight: 700;
+    }
+    .value-reset.active {
+      background: rgba(255,255,255,.94);
+      color: #13231b;
+    }
     .gallery-count { margin: 34px 0 18px; color: rgba(255,255,255,.72); }
     .gallery {
       display: grid;
@@ -465,7 +529,18 @@
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="m16.5 16.5 4 4"></path></svg>
               <input id="search" class="search-input" placeholder="Sök på svenskt eller vetenskapligt namn…" oninput="renderGallery()" />
             </div>
-            <div id="filters" class="filters"></div>
+            <div>
+              <div id="filters" class="filters"></div>
+              <div class="landing-value-filter" aria-label="Filtrera på signalvärde">
+                <span class="landing-value-filter-label">Signalvärde</span>
+                <div class="mini-pyramid-filter">
+                  <button type="button" class="mini-top" data-signal-filter="3" onclick="setSignalFilter(3)" title="Högsta signalvärde"></button>
+                  <button type="button" class="mini-mid" data-signal-filter="2" onclick="setSignalFilter(2)" title="Mellan signalvärde"></button>
+                  <button type="button" class="mini-base" data-signal-filter="1" onclick="setSignalFilter(1)" title="Lägsta signalvärde"></button>
+                </div>
+                <button type="button" id="signal-reset" class="value-reset active" onclick="setSignalFilter(null)">Alla</button>
+              </div>
+            </div>
           </div>
           <button id="clear-filters" class="clear-btn" type="button" onclick="clearFilters()" hidden>Rensa filter ↻</button>
           <p id="count" class="gallery-count"></p>
@@ -551,6 +626,7 @@
     ];
 
     const selectedFlags = new Set(["Alla"]);
+    let selectedSignalLevel = null;
     const allFlags = ["Alla", "Växter", "Svampar", "Lavar", "Orkidéer", "Fridlyst", "Signalart", "Tall", "Vedlevande", "Lövträd", "Fuktig skog"];
     const photoCache = new Map();
 
@@ -580,13 +656,34 @@
     }
 
     function clearFilters() {
-      selectedFlags.clear(); selectedFlags.add("Alla"); renderFilters(); renderGallery();
+      selectedFlags.clear();
+      selectedFlags.add("Alla");
+      selectedSignalLevel = null;
+      renderFilters();
+      renderSignalFilter();
+      renderGallery();
+    }
+
+    function setSignalFilter(level) {
+      selectedSignalLevel = level;
+      renderSignalFilter();
+      renderGallery();
+    }
+
+    function renderSignalFilter() {
+      document.querySelectorAll("[data-signal-filter]").forEach((button) => {
+        button.classList.toggle("active", Number(button.dataset.signalFilter) === selectedSignalLevel);
+      });
+      const reset = document.getElementById("signal-reset");
+      if (reset) reset.classList.toggle("active", selectedSignalLevel === null);
     }
 
     function matches(item, query) {
       const text = `${item.name} ${item.latin} ${item.group} ${item.subgroup} ${item.status} ${item.flags.join(" ")}`.toLowerCase();
       const activeFlags = [...selectedFlags].filter(flag => flag !== "Alla");
-      return (!query || text.includes(query)) && (activeFlags.length === 0 || activeFlags.every(flag => item.flags.includes(flag)));
+      return (!query || text.includes(query)) &&
+        (activeFlags.length === 0 || activeFlags.every(flag => item.flags.includes(flag))) &&
+        (selectedSignalLevel === null || item.signalLevel === selectedSignalLevel);
     }
 
     function renderGallery() {
@@ -750,6 +847,7 @@
     }
 
     renderFilters();
+    renderSignalFilter();
     renderGallery();
     const initialId = location.hash.replace("#", "");
     if (species.some(item => item.id === initialId)) showSpecies(initialId);
