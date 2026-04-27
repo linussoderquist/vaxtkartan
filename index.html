@@ -439,6 +439,40 @@
     .look-list li { display: flex; gap: 10px; color: #5f574f; line-height: 1.5; }
     .dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 8px; background: #a7f3d0; flex: 0 0 auto; }
     .dot.yellow { background: #fde68a; }
+    .value-pyramid {
+      display: grid;
+      gap: 8px;
+      justify-items: center;
+      margin-top: 18px;
+    }
+    .pyramid-level {
+      height: 42px;
+      display: grid;
+      place-items: center;
+      border-radius: 14px;
+      background: rgba(255,255,255,.58);
+      border: 1px solid var(--line);
+      color: #57534e;
+      font-size: .86rem;
+      font-weight: 800;
+      transition: .18s ease;
+    }
+    .pyramid-level.level-3 { width: 42%; }
+    .pyramid-level.level-2 { width: 68%; }
+    .pyramid-level.level-1 { width: 94%; }
+    .pyramid-level.active {
+      background: var(--green);
+      color: white;
+      box-shadow: 0 12px 26px rgba(18,63,49,.18);
+      transform: scale(1.02);
+    }
+    .pyramid-note {
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: .9rem;
+      text-align: center;
+    }
+
     .image-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 24px; }
     .image-ph {
       border: 1px solid var(--line);
@@ -529,6 +563,8 @@
         group: "Växt",
         subgroup: "Orkidé",
         status: "Fridlyst",
+        signalLevel: 3,
+        signalLabel: "Mycket högt signalvärde",
         flags: ["Fridlyst", "Kalkgynnad", "Skogsart", "Blomväxt", "Orkidé"],
         habitat: "Kalkrika skogar, lundar och fuktiga sluttningar",
         distribution: "Förekommer spritt i Sverige, främst där marken är kalkrik. Arten är lokalt sällsynt och ofta knuten till äldre, halvöppna skogsmiljöer.",
@@ -547,6 +583,8 @@
         group: "Svamp",
         subgroup: "Ticka",
         status: "Signalart",
+        signalLevel: 1,
+        signalLabel: "Lägre signalvärde",
         flags: ["Signalart", "Svamp", "Gammelskog", "Tall", "Vedlevande"],
         habitat: "Gamla levande tallar, ofta i äldre tallskogar",
         distribution: "Finns främst i landskap där det fortfarande finns gamla tallar. Den är vanligast i äldre barrskogsmiljöer men saknas i många brukade bestånd.",
@@ -699,6 +737,24 @@
       window.scrollTo({ top: 0, behavior: "instant" });
     }
 
+    function valuePyramidHtml(item) {
+      const levels = [
+        { level: 3, label: "Högst" },
+        { level: 2, label: "Mellan" },
+        { level: 1, label: "Lägst" }
+      ];
+      return `
+        <div class="value-pyramid" aria-label="Signalvärdespyramid">
+          ${levels.map(entry => `
+            <div class="pyramid-level level-${entry.level} ${item.signalLevel === entry.level ? "active" : ""}">
+              ${item.signalLevel === entry.level ? escapeHtml(item.signalLabel) : entry.label}
+            </div>
+          `).join("")}
+        </div>
+        <div class="pyramid-note">Utifrån Nitare, 2020.</div>
+      `;
+    }
+
     function speciesPageHtml(item) {
       return `
         <div class="hero-area">
@@ -759,8 +815,9 @@
                   </ul>
                 </article>
                 <article class="white-card">
-                  <div class="card-title">Naturvård</div>
-                  <p><strong>${escapeHtml(item.status)}</strong>. Informationen här kan utvecklas med hotbild, hänsynsråd och länkar till mer artfakta.</p>
+                  <div class="card-title">Signalvärde vid naturvärdesbedömning</div>
+                  <p><strong>${escapeHtml(item.signalLabel)}.</strong> Pyramiden visar hur starkt artens förekomst kan väga som signal vid en naturvärdesbedömning.</p>
+                  ${valuePyramidHtml(item)}
                 </article>
               </div>
 
