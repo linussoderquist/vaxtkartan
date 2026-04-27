@@ -657,6 +657,9 @@
             <div class="fact"><span class="fact-icon">↓</span><div><strong>Status</strong>${escapeHtml(item.status)}</div></div>
           </div>
         </aside>
+        <main>
+          <div class="visual-card splat-wrap"><iframe title="Interaktiv 3D-modell av ${escapeHtml(item.name)}" allow="fullscreen; xr-spatial-tracking" src="${escapeHtml(item.viewerUrl)}"></iframe></div>
+        </main>
         <aside class="right-col">
           <div class="mini-thumb" data-mini-photo="0"><img alt="${escapeHtml(item.name)} bild 1" />${illustrationHtml(item)}</div>
           <div class="mini-thumb" data-mini-photo="1"><img alt="${escapeHtml(item.name)} bild 2" />${illustrationHtml(item)}</div>
