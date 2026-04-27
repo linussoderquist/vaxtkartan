@@ -3,74 +3,850 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Digital flora – Signalarter i 3D</title>
+  <title>Digital flora – 3D-arter</title>
   <style>
-    :root{
-      --ink:#102019;--muted:#647067;--forest:#10261d;--cream:#f6f4ed;--paper:#f8f7f1;
-      --line:rgba(255,255,255,.24);--dark-line:rgba(16,32,25,.12);--shadow:0 24px 70px rgba(0,0,0,.22)
+    :root {
+      --ink: #10231b;
+      --cream: #f4f1e8;
+      --forest: #07120d;
+      --forest2: #14291f;
+      --line: rgba(255,255,255,.24);
+      --shadow: 0 24px 80px rgba(0,0,0,.32);
+      --soft: 0 18px 50px rgba(10,24,17,.16);
+      --glass: rgba(18, 35, 26, .64);
     }
-    *{box-sizing:border-box} html{scroll-behavior:smooth} body{margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--paper);color:var(--ink)}
-    button,input{font:inherit} button{cursor:pointer} .wrap{width:min(1180px,calc(100% - 48px));margin:0 auto}
-    .forest{min-height:720px;color:white;position:relative;overflow:hidden;background:linear-gradient(180deg,rgba(5,18,13,.20),rgba(5,18,13,.82)),url("assets/scandinavian-wet-forest.jpg") center/cover no-repeat,linear-gradient(135deg,#14281e,#334736 45%,#08140f)}
-    .forest:before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at top,rgba(255,255,255,.28),transparent 48%),linear-gradient(90deg,rgba(255,255,255,.05),transparent 18%,transparent 80%,rgba(255,255,255,.04));pointer-events:none}.forest>*{position:relative;z-index:1}
-    .topbar{display:flex;justify-content:space-between;align-items:center;gap:24px;padding:26px 0 22px;border-bottom:1px solid rgba(255,255,255,.15)}
-    .brand{display:flex;align-items:center;gap:13px;border:0;background:transparent;color:inherit;text-align:left;padding:0}.mark{width:42px;height:42px;border-radius:999px;display:grid;place-items:center;border:1px solid rgba(255,255,255,.45);background:rgba(255,255,255,.1);backdrop-filter:blur(14px)}
-    .brand-title{display:block;font-weight:760;font-size:1.05rem}.brand-sub{display:block;color:rgba(255,255,255,.74);font-size:.88rem;margin-top:2px}.nav{display:flex;gap:24px;align-items:center}.nav a,.nav button{border:0;background:transparent;color:rgba(255,255,255,.86);font-weight:650;text-decoration:none}.nav .active{color:white;border-bottom:2px solid white;padding-bottom:8px}.info-dot{width:28px;height:28px;border:1px solid rgba(255,255,255,.48);border-radius:999px;display:grid;place-items:center}
-    .head{padding-top:54px;display:grid;grid-template-columns:430px 1fr;gap:36px;align-items:end}h1{font-family:Georgia,"Times New Roman",serif;font-weight:500;font-size:clamp(3.2rem,7vw,5.4rem);line-height:.96;letter-spacing:-.045em;margin:0}.search{position:relative;margin-top:22px}.search input{width:100%;border:1px solid rgba(255,255,255,.30);border-radius:999px;padding:15px 18px 15px 48px;background:rgba(255,255,255,.13);color:white;outline:none;backdrop-filter:blur(18px);box-shadow:0 14px 30px rgba(0,0,0,.18)}.search input::placeholder{color:rgba(255,255,255,.78)}.search span{position:absolute;left:18px;top:50%;transform:translateY(-50%);color:rgba(255,255,255,.75)}
-    .filters{display:flex;flex-wrap:wrap;gap:12px}.filter{border:1px solid rgba(255,255,255,.22);border-radius:999px;background:rgba(255,255,255,.15);color:white;padding:11px 19px;backdrop-filter:blur(18px);box-shadow:0 12px 28px rgba(0,0,0,.14)}.filter.active{background:rgba(255,255,255,.92);color:var(--ink)}.clear{margin-top:16px;border:0;background:transparent;color:white;font-weight:650}.count{color:rgba(255,255,255,.70);margin:30px 0 18px}
-    .gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;padding-bottom:54px}.card{overflow:hidden;border:1px solid rgba(255,255,255,.24);border-radius:16px;background:rgba(245,245,239,.90);color:var(--ink);text-align:left;box-shadow:var(--shadow);padding:0;transition:.2s}.card:hover{transform:translateY(-5px);border-color:rgba(255,255,255,.52)}.thumb{height:154px;overflow:hidden;background:linear-gradient(135deg,#dfeadd,#becbb8);position:relative}.thumb img{display:none;width:100%;height:100%;object-fit:cover;filter:saturate(.9) contrast(.98)}.thumb.loaded img{display:block}.thumb.loaded .fallback{display:none}.fallback{height:100%}.card-body{padding:16px}.card h3{font-size:1.36rem;letter-spacing:-.035em;margin:0}.latin{font-style:italic;color:#66736a;margin:4px 0 0}.tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;align-items:center}.tag{border-radius:999px;padding:7px 11px;font-size:.78rem;font-weight:740;background:#e8ebe2;color:#425047}.tag.yellow{background:#f5d77a;color:#5c4210}.tag.green{background:#94e6bf;color:#123f31}.arrow{margin-left:auto;width:28px;height:28px;border-radius:999px;background:rgba(255,255,255,.6);display:grid;place-items:center}
-    .illustration{height:100%;position:relative;overflow:hidden;background:linear-gradient(135deg,#f3ecc7,#dcecc9,#c8dfcf)}.illustration.tallticka{background:linear-gradient(135deg,#d9dfd6,#c5d7c7,#e6e1cc)}.guckusko-symbol,.tallticka-symbol{position:absolute;inset:0;display:grid;place-items:center}.guckusko-symbol:before{content:"";width:142px;height:142px;background:radial-gradient(circle at 50% 52%,#f8d83a 0 25%,transparent 26%),radial-gradient(ellipse at 32% 31%,rgba(94,43,22,.78) 0 22%,transparent 23%),radial-gradient(ellipse at 68% 31%,rgba(94,43,22,.78) 0 22%,transparent 23%),linear-gradient(90deg,transparent 48%,rgba(44,122,83,.62) 49% 52%,transparent 53%)}.tallticka-symbol:before{content:"";width:156px;height:156px;background:radial-gradient(ellipse at 43% 45%,rgba(91,88,82,.95) 0 24%,transparent 25%),radial-gradient(ellipse at 44% 56%,rgba(50,47,43,.88) 0 17%,transparent 18%),linear-gradient(90deg,transparent 50%,rgba(70,76,66,.54) 51% 70%,transparent 71%)}.empty{border:1px solid rgba(255,255,255,.25);border-radius:18px;background:rgba(255,255,255,.14);padding:28px;color:white;backdrop-filter:blur(14px);margin-bottom:54px}
-    .about{padding:44px 0 60px;color:#4c5a51}.about h2{font-family:Georgia,"Times New Roman",serif;font-size:2.4rem;font-weight:500;margin:0 0 12px;color:#173527}.about p{max-width:760px;line-height:1.7}
-    #species-page{display:none;min-height:100vh;background:var(--paper)}.species-layout{display:grid;grid-template-columns:420px 1fr;min-height:100vh}.species-info{padding:42px 40px 50px max(40px,calc((100vw - 1180px)/2));background:radial-gradient(circle at 20% 0%,rgba(171,207,162,.24),transparent 35%),linear-gradient(180deg,#f7f6f0,#eeeee8)}.back{border:0;background:transparent;color:#334238;padding:0;font-weight:650;margin-bottom:34px}.species-title{font-family:Georgia,"Times New Roman",serif;font-size:clamp(3rem,6vw,4.8rem);font-weight:500;line-height:.98;letter-spacing:-.045em;color:#173527;margin:0}.species-info .latin{font-size:1.35rem;margin-top:10px}.species-tags{display:flex;flex-wrap:wrap;gap:9px;margin:24px 0}.species-desc{color:#36443a;line-height:1.75}.facts{display:grid;gap:18px;margin:36px 0 34px}.fact{display:grid;grid-template-columns:34px 1fr;gap:14px;color:#405047}.fact-icon{width:30px;height:30px;border-radius:999px;display:grid;place-items:center;border:1px solid rgba(18,63,49,.22);color:#173527}.fact strong{display:block;color:#69746c;font-weight:650;margin-bottom:3px}
-    .pyramid{width:min(260px,84%);display:grid;gap:9px;margin:0 auto;justify-items:center}.pyramid-part{height:56px;opacity:.38;background:#d7d8ce;clip-path:polygon(50% 0,100% 100%,0 100%)}.pyramid-part.top{width:86px;background:#174332}.pyramid-part.mid{width:166px;clip-path:polygon(25% 0,75% 0,100% 100%,0 100%);background:#aeb9ab}.pyramid-part.base{width:248px;clip-path:polygon(17% 0,83% 0,100% 100%,0 100%);background:#d8d3c9}.pyramid-part.active{opacity:1;background:#123f31;filter:drop-shadow(0 16px 26px rgba(18,63,49,.20));transform:scale(1.035)}.pyramid-note{text-align:center;color:#6a766d;font-size:.92rem;margin-top:14px}
-    .species-visual{padding:42px max(40px,calc((100vw - 1180px)/2)) 42px 36px;background:linear-gradient(180deg,#f5f4ed,#f1f0ea)}.visual-card{border-radius:18px;background:#151715;border:1px solid rgba(15,31,25,.16);overflow:hidden;box-shadow:0 28px 80px rgba(15,31,25,.18);position:relative}.viewer-top{position:absolute;z-index:2;top:16px;left:16px;border-radius:999px;background:rgba(255,255,255,.92);color:#17251d;padding:9px 13px;font-size:.86rem;font-weight:800}.visual-card iframe{display:block;width:100%;height:min(64vh,680px);min-height:520px;border:0}.strip{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:14px;padding:12px;border-radius:18px;background:rgba(255,255,255,.58);border:1px solid var(--dark-line)}.mini{height:88px;border-radius:12px;overflow:hidden;background:#dfe8dc}.mini img{display:none;width:100%;height:100%;object-fit:cover}.mini.loaded img{display:block}.mini.loaded .illustration{display:none}.bottom{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:22px}.white-card{border:1px solid var(--dark-line);border-radius:22px;background:rgba(255,255,255,.76);padding:24px;box-shadow:0 16px 40px rgba(15,31,25,.12)}.white-card p{color:#4c5a51;line-height:1.65}.card-title{font-weight:830;margin-bottom:12px;color:#1a2b22}.map{height:180px;margin-top:18px;border-radius:18px;padding:16px;color:#607068;background:radial-gradient(circle at 45% 40%,rgba(18,63,49,.30),transparent 9%),radial-gradient(circle at 52% 58%,rgba(18,63,49,.22),transparent 11%),linear-gradient(135deg,rgba(255,255,255,.8),rgba(225,228,216,.8));border:1px solid var(--dark-line)}.look{display:grid;gap:10px;padding:0;margin:0;list-style:none}.look li{display:flex;gap:10px;color:#4c5a51;line-height:1.45}.dot{width:8px;height:8px;border-radius:50%;margin-top:8px;background:#8ee4bb;flex:0 0 auto}.dot.yellow{background:#f5d77a}
-    @media(max-width:1050px){.head,.species-layout{grid-template-columns:1fr}.gallery{grid-template-columns:repeat(2,1fr)}.species-info,.species-visual{padding:36px 24px}.bottom{grid-template-columns:1fr}.visual-card iframe{height:560px;min-height:440px}}@media(max-width:680px){.wrap{width:calc(100% - 30px)}.nav{display:none}.gallery{grid-template-columns:1fr}.filters{overflow-x:auto;flex-wrap:nowrap;padding-bottom:4px}.filter{white-space:nowrap}.visual-card iframe{height:480px;min-height:420px}}
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: white;
+      background: var(--forest);
+    }
+    button, input { font: inherit; }
+    button { cursor: pointer; }
+    .wrap { width: min(1220px, calc(100% - 56px)); margin: 0 auto; }
+
+    .site-bg {
+      min-height: 100vh;
+      background:
+        linear-gradient(180deg, rgba(6,16,11,.12), rgba(6,16,11,.86) 72%),
+        radial-gradient(circle at 35% 3%, rgba(236,245,232,.28), transparent 28%),
+        radial-gradient(circle at 80% 24%, rgba(110,140,104,.20), transparent 32%),
+        url("assets/scandinavian-wet-forest.jpg") center top / cover fixed no-repeat,
+        linear-gradient(135deg, #182a1f, #07120d);
+    }
+    .site-bg::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background: rgba(4, 14, 9, .28);
+      z-index: 0;
+    }
+    .site-content { position: relative; z-index: 1; }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 22px;
+      padding: 32px 0 26px;
+      border-bottom: 1px solid rgba(255,255,255,.17);
+    }
+    .brand {
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      color: white;
+      background: transparent;
+      border: 0;
+      padding: 0;
+      text-align: left;
+    }
+    .brand-mark {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(255,255,255,.48);
+      background: rgba(255,255,255,.09);
+      backdrop-filter: blur(16px);
+      font-size: 1.22rem;
+    }
+    .brand-title { display: block; font-weight: 800; font-size: 1.12rem; }
+    .brand-sub { display: block; color: rgba(255,255,255,.76); font-size: .92rem; margin-top: 2px; }
+    .nav { display: flex; align-items: center; gap: 26px; }
+    .nav a, .nav button {
+      color: rgba(255,255,255,.86);
+      background: transparent;
+      border: 0;
+      text-decoration: none;
+      font-weight: 700;
+      padding: 8px 0;
+    }
+    .nav .active { color: white; border-bottom: 2px solid white; }
+    .info-dot {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(255,255,255,.42);
+    }
+
+    /* GALLERY */
+    #gallery-page { min-height: 100vh; }
+    .gallery-hero { padding: 58px 0 68px; }
+    h1 {
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      font-weight: 500;
+      letter-spacing: -.055em;
+      font-size: clamp(3.6rem, 7vw, 5.9rem);
+      line-height: .95;
+      color: #fffaf0;
+    }
+    .search-row {
+      margin-top: 24px;
+      display: grid;
+      grid-template-columns: minmax(280px, 410px) 1fr;
+      gap: 34px;
+      align-items: start;
+    }
+    .search-wrap { position: relative; }
+    .search-wrap svg {
+      position: absolute;
+      left: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: rgba(255,255,255,.76);
+    }
+    .search-input {
+      width: 100%;
+      border: 1px solid rgba(255,255,255,.32);
+      border-radius: 999px;
+      padding: 16px 18px 16px 50px;
+      outline: none;
+      color: white;
+      background: rgba(255,255,255,.13);
+      backdrop-filter: blur(20px);
+      box-shadow: 0 14px 30px rgba(0,0,0,.18);
+    }
+    .search-input::placeholder { color: rgba(255,255,255,.78); }
+    .filters { display: flex; flex-wrap: wrap; gap: 12px; }
+    .filter-chip {
+      border: 1px solid rgba(255,255,255,.23);
+      color: white;
+      background: rgba(255,255,255,.14);
+      border-radius: 999px;
+      padding: 12px 21px;
+      backdrop-filter: blur(18px);
+      box-shadow: 0 12px 28px rgba(0,0,0,.14);
+      transition: .18s ease;
+    }
+    .filter-chip:hover { background: rgba(255,255,255,.22); transform: translateY(-1px); }
+    .filter-chip.active { background: rgba(255,255,255,.94); color: #13231b; }
+    .clear-btn {
+      border: 0;
+      background: transparent;
+      color: rgba(255,255,255,.86);
+      font-weight: 700;
+      margin: 16px 0 0 auto;
+      display: block;
+    }
+    .landing-value-filter {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-top: 18px;
+      color: rgba(255,255,255,.78);
+    }
+    .landing-value-filter-label {
+      font-size: .9rem;
+      font-weight: 750;
+      white-space: nowrap;
+    }
+    .mini-pyramid-filter {
+      display: grid;
+      gap: 5px;
+      justify-items: center;
+      padding: 10px 12px;
+      border: 1px solid rgba(255,255,255,.22);
+      border-radius: 18px;
+      background: rgba(255,255,255,.12);
+      backdrop-filter: blur(16px);
+      box-shadow: 0 12px 28px rgba(0,0,0,.14);
+    }
+    .mini-pyramid-filter button {
+      border: 0;
+      padding: 0;
+      opacity: .52;
+      background: #aeb8aa;
+      transition: .16s ease;
+    }
+    .mini-pyramid-filter button:hover,
+    .mini-pyramid-filter button.active {
+      opacity: 1;
+      background: #f7f6f0;
+      transform: scale(1.05);
+    }
+    .mini-pyramid-filter .mini-top {
+      width: 34px;
+      height: 25px;
+      clip-path: polygon(50% 0, 100% 100%, 0 100%);
+    }
+    .mini-pyramid-filter .mini-mid {
+      width: 66px;
+      height: 25px;
+      clip-path: polygon(25% 0, 75% 0, 100% 100%, 0 100%);
+    }
+    .mini-pyramid-filter .mini-base {
+      width: 98px;
+      height: 25px;
+      clip-path: polygon(17% 0, 83% 0, 100% 100%, 0 100%);
+    }
+    .value-reset {
+      border: 1px solid rgba(255,255,255,.22);
+      border-radius: 999px;
+      background: rgba(255,255,255,.12);
+      color: rgba(255,255,255,.86);
+      padding: 8px 12px;
+      font-size: .84rem;
+      font-weight: 700;
+    }
+    .value-reset.active {
+      background: rgba(255,255,255,.94);
+      color: #13231b;
+    }
+    .gallery-count { margin: 34px 0 18px; color: rgba(255,255,255,.72); }
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(170px, 1fr));
+      gap: 18px;
+    }
+    .card {
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,.28);
+      border-radius: 16px;
+      background: rgba(17,32,24,.64);
+      color: white;
+      padding: 0;
+      text-align: left;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+      transition: .18s ease;
+    }
+    .card:hover { transform: translateY(-5px); background: rgba(22,41,30,.74); }
+    .taxon-thumb {
+      height: 250px;
+      overflow: hidden;
+      background: linear-gradient(135deg, #1c2f23, #0d1912);
+      position: relative;
+    }
+    .taxon-thumb::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, transparent 55%, rgba(6,14,10,.40));
+      pointer-events: none;
+    }
+    .taxon-thumb img {
+      display: none;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: saturate(.88) contrast(1.04) brightness(.88);
+    }
+    .taxon-thumb.loaded img { display: block; }
+    .taxon-thumb.loaded .fallback-illustration { display: none; }
+    .fallback-illustration { position: absolute; inset: 0; }
+    .card-body {
+      padding: 18px;
+      background: linear-gradient(180deg, rgba(17,31,23,.78), rgba(10,21,15,.93));
+    }
+    .card h3 {
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 1.55rem;
+      font-weight: 560;
+      letter-spacing: -.035em;
+      color: #fffaf0;
+    }
+    .latin { margin: 5px 0 0; font-style: italic; color: rgba(255,255,255,.75); }
+    .tag-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 14px; }
+    .tag {
+      border-radius: 999px;
+      padding: 7px 11px;
+      font-size: .78rem;
+      font-weight: 760;
+      color: rgba(255,255,255,.92);
+      background: rgba(255,255,255,.16);
+      border: 1px solid rgba(255,255,255,.10);
+    }
+    .tag.yellow { background: rgba(245,215,122,.82); color: #3c2a08; }
+    .tag.green { background: rgba(99,207,155,.58); color: white; }
+    .open-arrow {
+      margin-left: auto;
+      width: 28px;
+      height: 28px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: rgba(255,255,255,.14);
+    }
+    .empty {
+      border: 1px solid rgba(255,255,255,.22);
+      border-radius: 18px;
+      background: rgba(255,255,255,.14);
+      padding: 28px;
+      color: white;
+      backdrop-filter: blur(14px);
+    }
+
+    /* FALLBACK ILLUSTRATIONS */
+    .illustration {
+      position: relative;
+      height: 100%;
+      background: linear-gradient(135deg, #304c38, #0f1d15);
+    }
+    .illustration.large { height: 100%; }
+    .illustration.tallticka { background: linear-gradient(135deg, #2f3d33, #111d16); }
+    .guckusko-symbol, .tallticka-symbol { position: absolute; inset: 0; display: grid; place-items: center; }
+    .guckusko-symbol::before {
+      content: "";
+      width: 148px;
+      height: 148px;
+      border-radius: 58% 42% 52% 48%;
+      background:
+        radial-gradient(circle at 50% 52%, #f4d23a 0 25%, transparent 26%),
+        radial-gradient(ellipse at 32% 31%, rgba(90,42,22,.82) 0 22%, transparent 23%),
+        radial-gradient(ellipse at 68% 31%, rgba(90,42,22,.82) 0 22%, transparent 23%),
+        linear-gradient(90deg, transparent 48%, rgba(78,151,108,.75) 49% 52%, transparent 53%);
+      filter: drop-shadow(0 18px 18px rgba(0,0,0,.18));
+    }
+    .tallticka-symbol::before {
+      content: "";
+      width: 160px;
+      height: 160px;
+      background:
+        radial-gradient(ellipse at 43% 45%, rgba(91,88,82,.95) 0 24%, transparent 25%),
+        radial-gradient(ellipse at 44% 56%, rgba(50,47,43,.88) 0 17%, transparent 18%),
+        linear-gradient(90deg, transparent 50%, rgba(110,120,100,.54) 51% 70%, transparent 71%);
+      filter: drop-shadow(0 18px 18px rgba(0,0,0,.20));
+    }
+
+    /* SPECIES PAGE */
+    #species-page { display: none; min-height: 100vh; }
+    .species-shell {
+      min-height: 100vh;
+      background:
+        linear-gradient(180deg, rgba(7,18,13,.88), rgba(7,18,13,.95)),
+        url("assets/scandinavian-wet-forest.jpg") center top / cover fixed no-repeat,
+        #07120d;
+      padding: 42px 0 44px;
+    }
+    .species-layout {
+      width: min(1280px, calc(100% - 56px));
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: minmax(300px, 340px) minmax(460px, 1fr) 300px;
+      gap: 24px;
+      align-items: start;
+    }
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      margin-bottom: 48px;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: rgba(255,255,255,.84);
+      font-weight: 700;
+    }
+    .species-title {
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(3rem, 4.2vw, 4.15rem);
+      font-weight: 500;
+      line-height: .96;
+      letter-spacing: -.05em;
+      color: #fffaf0;
+      max-width: 100%;
+      overflow-wrap: normal;
+      white-space: normal;
+    }
+    .species-latin { margin: 12px 0 0; color: rgba(255,255,255,.72); font-style: italic; font-size: 1.18rem; line-height: 1.35; }
+    .species-tags { display: flex; flex-wrap: wrap; gap: 9px; margin: 24px 0 30px; }
+    .species-desc { color: rgba(255,255,255,.78); line-height: 1.72; font-size: .95rem; }
+    .facts { display: grid; gap: 22px; margin-top: 38px; }
+    .fact {
+      display: grid;
+      grid-template-columns: 28px 1fr;
+      gap: 13px;
+      color: rgba(255,255,255,.86);
+      line-height: 1.38;
+    }
+    .fact-icon {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(255,255,255,.35);
+      color: rgba(255,255,255,.90);
+      font-size: .82rem;
+    }
+    .fact strong { display: block; color: rgba(255,255,255,.60); font-weight: 700; margin-bottom: 3px; }
+    .visual-card {
+      overflow: hidden;
+      border-radius: 16px;
+      background: #101410;
+      border: 1px solid rgba(255,255,255,.24);
+      box-shadow: 0 28px 80px rgba(0,0,0,.30);
+    }
+    .splat-wrap { position: relative; }
+
+    .splat-wrap iframe { display: block; width: 100%; height: 620px; border: 0; }
+    .right-col { display: grid; gap: 14px; }
+    .mini-thumb {
+      height: 156px;
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,.22);
+      background: #1b2b20;
+      position: relative;
+      box-shadow: 0 14px 36px rgba(0,0,0,.18);
+    }
+    .mini-thumb img { width: 100%; height: 100%; object-fit: cover; display: none; filter: saturate(.88) brightness(.90); }
+    .mini-thumb.loaded img { display: block; }
+    .mini-thumb.loaded .illustration { display: none; }
+    .pyramid-box {
+      min-height: 330px;
+      display: grid;
+      align-content: center;
+      border-radius: 16px;
+      background: linear-gradient(135deg, #f4f0e7, #e9e5d9);
+      box-shadow: var(--soft);
+      padding: 36px 22px 22px;
+    }
+    .pyramid { display: grid; gap: 12px; justify-items: center; }
+    .pyramid-part { opacity: .34; background: #d5d0c5; height: 64px; transition: .18s ease; }
+    .pyramid-part.top { width: 84px; clip-path: polygon(50% 0, 100% 100%, 0 100%); background: #aeb8aa; }
+    .pyramid-part.mid { width: 168px; clip-path: polygon(25% 0, 75% 0, 100% 100%, 0 100%); background: #aeb8aa; }
+    .pyramid-part.base { width: 252px; clip-path: polygon(17% 0, 83% 0, 100% 100%, 0 100%); background: #aeb8aa; }
+    .pyramid-part.active { opacity: 1; background: #123f31; filter: drop-shadow(0 14px 24px rgba(18,63,49,.24)); transform: scale(1.035); }
+    .pyramid-note { margin-top: 16px; text-align: center; color: #6b746d; font-size: .88rem; }
+    .species-bottom {
+      grid-column: 2 / 4;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-top: 8px;
+    }
+    .white-card {
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 16px;
+      background: rgba(255,255,255,.92);
+      color: var(--ink);
+      padding: 22px;
+      box-shadow: var(--soft);
+    }
+    .card-title { font-weight: 850; margin-bottom: 12px; }
+    .white-card p { color: #4c5a51; line-height: 1.65; }
+    .map-placeholder {
+      height: 170px;
+      margin-top: 16px;
+      border-radius: 14px;
+      padding: 14px;
+      color: #607068;
+      background:
+        radial-gradient(circle at 45% 40%, rgba(18,63,49,.30), transparent 9%),
+        radial-gradient(circle at 52% 58%, rgba(18,63,49,.22), transparent 11%),
+        linear-gradient(135deg, rgba(255,255,255,.8), rgba(225,228,216,.8));
+      border: 1px solid rgba(15,31,25,.12);
+    }
+    .look-list { display: grid; gap: 10px; padding: 0; margin: 0; list-style: none; }
+    .look-list li { display: flex; gap: 10px; color: #4c5a51; line-height: 1.45; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 8px; background: #8ee4bb; flex: 0 0 auto; }
+    .dot.yellow { background: #f5d77a; }
+
+    #om-projektet {
+      padding: 44px 0 60px;
+      color: rgba(255,255,255,.78);
+    }
+    #om-projektet h2 {
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 2.4rem;
+      font-weight: 500;
+      margin: 0 0 12px;
+      color: #fffaf0;
+    }
+    #om-projektet p { max-width: 760px; line-height: 1.7; }
+
+    @media (max-width: 1180px) {
+      .gallery { grid-template-columns: repeat(3, 1fr); }
+      .search-row { grid-template-columns: 1fr; }
+      .species-layout { grid-template-columns: 1fr; width: min(780px, calc(100% - 32px)); }
+      .right-col { grid-template-columns: repeat(3, 1fr); }
+      .pyramid-box { grid-column: 1 / -1; }
+      .species-bottom { grid-column: auto; grid-template-columns: 1fr; }
+    }
+    @media (max-width: 680px) {
+      .wrap { width: min(100% - 30px, 1180px); }
+      .nav { display: none; }
+      .gallery { grid-template-columns: 1fr; }
+      .filters { overflow-x: auto; flex-wrap: nowrap; padding-bottom: 4px; }
+      .filter-chip { white-space: nowrap; }
+      .right-col { grid-template-columns: 1fr; }
+      .splat-wrap iframe { height: 460px; }
+    }
   </style>
 </head>
 <body>
-  <section id="gallery-page">
-    <div class="forest">
-      <header class="wrap topbar">
-        <button class="brand" type="button" onclick="goGallery()"><span class="mark">♧</span><span><span class="brand-title">Digital flora</span><span class="brand-sub">Signalarter i 3D</span></span></button>
-        <nav class="nav"><a class="active" href="#gallery-page">Artgalleri</a><a href="#om-projektet">Om projektet</a><span class="info-dot">i</span></nav>
-      </header>
-      <section class="wrap head">
-        <div><h1>Artgalleri</h1><div class="search"><span>⌕</span><input id="search" placeholder="Sök på svenskt eller vetenskapligt namn…" oninput="renderGallery()"></div></div>
-        <div><div id="filters" class="filters"></div><button id="clear" class="clear" onclick="clearFilters()" hidden>Rensa filter ↻</button></div>
-      </section>
-      <section class="wrap"><p id="count" class="count"></p><div id="gallery" class="gallery"></div><div id="empty" class="empty" hidden>Inga arter matchade sökningen.</div></section>
-    </div>
-    <section id="om-projektet" class="wrap about"><h2>Om projektet</h2><p>En digital flora där klassisk artkunskap kombineras med interaktiva 3D-modeller. Galleriet använder lätta artbilder, medan artsidorna visar inbäddade gaussian splats.</p></section>
-  </section>
-  <section id="species-page"></section>
+  <div class="site-bg">
+    <div class="site-content">
+      <section id="gallery-page">
+        <header class="wrap topbar">
+          <button class="brand" type="button" onclick="showGallery()">
+            <span class="brand-mark">♧</span>
+            <span><span class="brand-title">Digital flora</span><span class="brand-sub">3D-arter, ekologi och utbredning</span></span>
+          </button>
+          <nav class="nav">
+            <a class="active" href="#gallery-page">Artgalleri</a>
+            <a href="#om-projektet">Om projektet</a>
+            <span class="info-dot">i</span>
+          </nav>
+        </header>
 
-<script>
-const species=[
-{id:'guckusko',name:'Guckusko',latin:'Cypripedium calceolus',group:'Växter',subgroup:'Orkidé',family:'Orchidaceae',flowering:'Juni – juli',status:'Fridlyst i hela Sverige',signalLevel:3,flags:['Växter','Orkidéer','Fridlyst','Signalart'],habitat:'Äldre, fuktiga skogar med kalkrik mark',distribution:'Förekommer spritt i Sverige, främst där marken är kalkrik. Arten är lokalt sällsynt och ofta knuten till äldre, halvöppna skogsmiljöer.',description:'Guckuskon är en av våra mest karismatiska orkidéer. Den stora gula läppen fungerar som en tillfällig fälla för insekter, som leds ut förbi pollinierna och därmed hjälper till med pollineringen.',ecology:'Arten är beroende av rätt markkemi, fungerande mykorrhizasvampar och stabila växtplatser.',lookFor:['Stor gul toffelformad blomläpp','Brunröda kalkblad','Breda veckade blad','Ofta i kalkpåverkad skog'],viewerUrl:'https://superspl.at/s?id=b46fcc5b',accent:'yellow',illustrationClass:'guckusko'},
-{id:'tallticka',name:'Tallticka',latin:'Porodaedalea pini',group:'Svampar',subgroup:'Ticka',family:'Hymenochaetaceae',flowering:'Flerårig fruktkropp',status:'Signalart',signalLevel:1,flags:['Svampar','Signalart','Tall','Vedlevande'],habitat:'Gamla levande tallar, ofta i äldre tallskogar',distribution:'Finns främst i landskap där det fortfarande finns gamla tallar. Den är vanligast i äldre barrskogsmiljöer men saknas i många brukade bestånd.',description:'Talltickan är en flerårig ticka som växer på levande tallar. Den är ofta diskret men viktig eftersom den berättar något om skogens ålder, kontinuitet och förekomsten av gamla träd.',ecology:'Svampen orsakar kärnröta i tall och skapar livsmiljöer för andra arter.',lookFor:['Hård hovformad fruktkropp','Växer på levande tall','Ofta högt upp på stammen','Kopplad till gamla tallar'],viewerUrl:'https://superspl.at/s?id=22d49954',accent:'green',illustrationClass:'tallticka'}
-];
-const allFlags=['Alla','Växter','Svampar','Orkidéer','Fridlyst','Signalart','Tall','Vedlevande'];
-const selectedFlags=new Set(['Alla']);
-console.assert(species.length>=2,'Minst två arter ska finnas.');
-console.assert(species.every(s=>s.viewerUrl&&s.latin&&s.signalLevel),'Alla arter ska ha viewerUrl, latin och signalLevel.');
-function esc(v){return String(v).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#039;')}
-function renderFilters(){document.getElementById('filters').innerHTML=allFlags.map(f=>`<button class="filter ${selectedFlags.has(f)?'active':''}" onclick="toggleFlag('${esc(f)}')">${esc(f)}</button>`).join('');document.getElementById('clear').hidden=selectedFlags.has('Alla')&&selectedFlags.size===1}
-function toggleFlag(f){if(f==='Alla'){selectedFlags.clear();selectedFlags.add('Alla')}else{selectedFlags.delete('Alla');selectedFlags.has(f)?selectedFlags.delete(f):selectedFlags.add(f);if(selectedFlags.size===0)selectedFlags.add('Alla')}renderFilters();renderGallery()}
-function clearFilters(){selectedFlags.clear();selectedFlags.add('Alla');renderFilters();renderGallery()}
-function matches(item,q){const txt=`${item.name} ${item.latin} ${item.group} ${item.subgroup} ${item.status} ${item.flags.join(' ')}`.toLowerCase();const active=[...selectedFlags].filter(f=>f!=='Alla');return(!q||txt.includes(q))&&(active.length===0||active.every(f=>item.flags.includes(f)))}
-function renderGallery(){const q=document.getElementById('search').value.trim().toLowerCase();const filtered=species.filter(i=>matches(i,q));document.getElementById('count').textContent=`${filtered.length} av ${species.length} arter visas`;document.getElementById('empty').hidden=filtered.length!==0;document.getElementById('gallery').innerHTML=filtered.map(item=>`<button class="card" onclick="openSpecies('${item.id}')">${galleryPreview(item)}<div class="card-body"><h3>${esc(item.name)}</h3><p class="latin">${esc(item.latin)}</p><div class="tags"><span class="tag ${item.accent}">${esc(item.subgroup)}</span><span class="tag">${esc(item.status.split(' i ')[0])}</span><span class="arrow">→</span></div></div></button>`).join('');loadGalleryPhotos(filtered)}
-function galleryPreview(item){return `<div class="thumb" data-photo-for="${esc(item.id)}"><img alt="${esc(item.name)}" loading="lazy"><div class="fallback">${illustration(item)}</div></div>`}
-function illustration(item){const symbol=item.id==='guckusko'?'guckusko-symbol':'tallticka-symbol';return `<div class="illustration ${item.illustrationClass}"><div class="${symbol}"></div></div>`}
-async function fetchINatPhotos(item,n=1){const key=`inat-photos:${item.latin}:${n}`;const cached=localStorage.getItem(key);if(cached){try{return JSON.parse(cached)}catch(e){}}try{const tax=await fetch(`https://api.inaturalist.org/v1/taxa?q=${encodeURIComponent(item.latin)}&rank=species&per_page=5`).then(r=>r.json());const exact=(tax.results||[]).find(t=>String(t.name).toLowerCase()===item.latin.toLowerCase())||(tax.results||[])[0];if(!exact)return[];const obs=await fetch(`https://api.inaturalist.org/v1/observations?taxon_id=${exact.id}&photos=true&quality_grade=research&per_page=${Math.max(n,3)}&order_by=votes`).then(r=>r.json());let urls=[];(obs.results||[]).forEach(o=>(o.photos||[]).forEach(p=>{if(p.url)urls.push(p.url.replace('square','medium'))}));if(urls.length===0&&exact.default_photo)urls=[exact.default_photo.medium_url||exact.default_photo.square_url||exact.default_photo.url];urls=[...new Set(urls)].slice(0,n);localStorage.setItem(key,JSON.stringify(urls));return urls}catch(e){console.warn('Kunde inte hämta iNaturalist-bilder',item.latin,e);return[]}}
-async function loadGalleryPhotos(items){for(const item of items){const thumb=document.querySelector(`[data-photo-for="${CSS.escape(item.id)}"]`);if(!thumb||thumb.classList.contains('loaded'))continue;const img=thumb.querySelector('img');const photos=await fetchINatPhotos(item,1);if(photos[0]&&img){img.src=photos[0];img.onload=()=>thumb.classList.add('loaded')}}}
-function pyramid(item){return `<div class="pyramid"><div class="pyramid-part top ${item.signalLevel===3?'active':''}"></div><div class="pyramid-part mid ${item.signalLevel===2?'active':''}"></div><div class="pyramid-part base ${item.signalLevel===1?'active':''}"></div></div><div class="pyramid-note">Utifrån Nitare, 2020.</div>`}
-function speciesHtml(item){return `<div class="species-layout"><aside class="species-info"><button class="back" onclick="goGallery()">← Tillbaka till galleri</button><h1 class="species-title">${esc(item.name)}</h1><p class="latin">${esc(item.latin)}</p><div class="species-tags"><span class="tag ${item.accent}">${esc(item.subgroup)}</span><span class="tag">${esc(item.status.split(' i ')[0])}</span><span class="tag">${esc(item.group)}</span></div><p class="species-desc">${esc(item.description)} ${esc(item.ecology)}</p><div class="facts"><div class="fact"><span class="fact-icon">♧</span><div><strong>Grupp</strong>${esc(item.group)}</div></div><div class="fact"><span class="fact-icon">✽</span><div><strong>Familj</strong>${esc(item.family)}</div></div><div class="fact"><span class="fact-icon">☼</span><div><strong>Blomningstid</strong>${esc(item.flowering)}</div></div><div class="fact"><span class="fact-icon">♧</span><div><strong>Livsmiljö</strong>${esc(item.habitat)}</div></div><div class="fact"><span class="fact-icon">↓</span><div><strong>Status</strong>${esc(item.status)}</div></div></div>${pyramid(item)}</aside><main class="species-visual"><div class="visual-card"><div class="viewer-top">◈ 3D (Gaussian Splat)</div><iframe title="Interaktiv 3D-modell av ${esc(item.name)}" allow="fullscreen; xr-spatial-tracking" src="${esc(item.viewerUrl)}"></iframe></div><div class="strip">${[0,1,2].map(i=>`<div class="mini" data-mini="${i}"><img alt="${esc(item.name)} bild ${i+1}" loading="lazy">${illustration(item)}</div>`).join('')}</div><div class="bottom"><article class="white-card"><div class="card-title">Utbredning</div><p>${esc(item.distribution)}</p><div class="map">Här kan en fyndkarta eller Artportalen/GBIF-modul kopplas in senare.</div></article><article class="white-card"><div class="card-title">Kännetecken</div><ul class="look">${item.lookFor.map(p=>`<li><span class="dot ${item.accent==='yellow'?'yellow':''}"></span>${esc(p)}</li>`).join('')}</ul></article></div></main></div>`}
-function openSpecies(id){if(location.hash!==`#${id}`)history.pushState({view:'species',id},'',`#${id}`);renderRoute()}
-function goGallery(){if(location.hash)history.pushState({view:'gallery'},'',location.pathname);renderRoute()}
-function renderRoute(){const id=location.hash.replace('#','');const item=species.find(s=>s.id===id);if(item){document.getElementById('gallery-page').style.display='none';const page=document.getElementById('species-page');page.style.display='block';page.innerHTML=speciesHtml(item);window.scrollTo({top:0,behavior:'instant'});loadSpeciesPhotos(item)}else{document.getElementById('gallery-page').style.display='block';const page=document.getElementById('species-page');page.style.display='none';page.innerHTML='';window.scrollTo({top:0,behavior:'instant'})}}
-async function loadSpeciesPhotos(item){const photos=await fetchINatPhotos(item,3);document.querySelectorAll('[data-mini]').forEach((thumb,i)=>{const img=thumb.querySelector('img');if(photos[i]&&img){img.src=photos[i];img.onload=()=>thumb.classList.add('loaded')}})}
-window.addEventListener('popstate',renderRoute);
-renderFilters();renderGallery();history.replaceState({view:location.hash?'species':'gallery'},'',location.href);renderRoute();
-</script>
+        <main class="wrap gallery-hero">
+          <h1>Artgalleri</h1>
+          <div class="search-row">
+            <div class="search-wrap">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="m16.5 16.5 4 4"></path></svg>
+              <input id="search" class="search-input" placeholder="Sök på svenskt eller vetenskapligt namn…" oninput="renderGallery()" />
+            </div>
+            <div>
+              <div id="filters" class="filters"></div>
+              <div class="landing-value-filter" aria-label="Filtrera på signalvärde">
+                <span class="landing-value-filter-label">Signalvärde</span>
+                <div class="mini-pyramid-filter">
+                  <button type="button" class="mini-top" data-signal-filter="3" onclick="setSignalFilter(3)" title="Högsta signalvärde"></button>
+                  <button type="button" class="mini-mid" data-signal-filter="2" onclick="setSignalFilter(2)" title="Mellan signalvärde"></button>
+                  <button type="button" class="mini-base" data-signal-filter="1" onclick="setSignalFilter(1)" title="Lägsta signalvärde"></button>
+                </div>
+                <button type="button" id="signal-reset" class="value-reset active" onclick="setSignalFilter(null)">Alla</button>
+              </div>
+            </div>
+          </div>
+          <button id="clear-filters" class="clear-btn" type="button" onclick="clearFilters()" hidden>Rensa filter ↻</button>
+          <p id="count" class="gallery-count"></p>
+          <div id="gallery" class="gallery"></div>
+          <div id="empty" class="empty" hidden>Inga arter matchade sökningen.</div>
+        </main>
+
+        <section id="om-projektet" class="wrap">
+          <h2>Om projektet</h2>
+          <p>En digital flora där klassisk artkunskap kombineras med interaktiva 3D-modeller. Galleriet använder lätta artbilder, medan artsidorna visar inbäddade gaussian splats.</p>
+        </section>
+      </section>
+
+      <section id="species-page"></section>
+    </div>
+  </div>
+
+  <script>
+    const species = [
+      {
+        id: "guckusko",
+        name: "Guckusko",
+        latin: "Cypripedium calceolus",
+        group: "Växter",
+        subgroup: "Orkidé",
+        family: "Orchidaceae",
+        flowering: "Juni – juli",
+        status: "Fridlyst i hela Sverige",
+        signalLevel: 3,
+        flags: ["Alla", "Växter", "Orkidéer", "Fridlyst", "Signalart"],
+        habitat: "Äldre, fuktiga skogar med kalkrik mark",
+        distribution: "Förekommer spritt i Sverige, främst där marken är kalkrik. Arten är lokalt sällsynt och ofta knuten till äldre, halvöppna skogsmiljöer.",
+        description: "Guckuskon är en av våra mest karismatiska orkidéer. Den stora gula läppen fungerar som en tillfällig fälla för insekter, som leds ut förbi pollinierna och därmed hjälper till med pollineringen.",
+        ecology: "Arten är beroende av rätt markkemi, fungerande mykorrhizasvampar och stabila växtplatser. Den kan finnas kvar länge på samma plats men är känslig för tramp, igenväxning och förändrad hydrologi.",
+        lookFor: ["Stor gul toffelformad blomläpp", "Brunröda kalkblad", "Breda veckade blad", "Ofta i kalkpåverkad skog"],
+        viewerUrl: "https://superspl.at/s?id=b46fcc5b",
+        localImage: "./assets/Cyp_cal.png",
+        accent: "yellow",
+        illustrationClass: "guckusko"
+      },
+      {
+        id: "tallticka",
+        name: "Tallticka",
+        latin: "Porodaedalea pini",
+        group: "Svampar",
+        subgroup: "Ticka",
+        family: "Hymenochaetaceae",
+        flowering: "Flerårig fruktkropp",
+        status: "Signalart",
+        signalLevel: 1,
+        flags: ["Alla", "Svampar", "Signalart", "Tall", "Vedlevande"],
+        habitat: "Gamla levande tallar, ofta i äldre tallskogar",
+        distribution: "Finns främst i landskap där det fortfarande finns gamla tallar. Den är vanligast i äldre barrskogsmiljöer men saknas i många brukade bestånd.",
+        description: "Talltickan är en flerårig ticka som växer på levande tallar. Den är ofta diskret men viktig eftersom den berättar något om skogens ålder, kontinuitet och förekomsten av gamla träd.",
+        ecology: "Svampen orsakar kärnröta i tall och skapar livsmiljöer för andra arter. Den är därför både en art i sig och en ekologisk motor i gamla tallmiljöer.",
+        lookFor: ["Hård hovformad fruktkropp", "Växer på levande tall", "Ofta högt upp på stammen", "Kopplad till gamla tallar"],
+        viewerUrl: "https://superspl.at/s?id=22d49954",
+        localImage: "./assets/Por_pin.png",
+        accent: "green",
+        illustrationClass: "tallticka"
+      },
+      {
+        id: "lunglav",
+        name: "Lunglav",
+        latin: "Lobaria pulmonaria",
+        group: "Lavar",
+        subgroup: "Bladlav",
+        family: "Lobariaceae",
+        flowering: "Flerårig lavbål",
+        status: "Signalart",
+        signalLevel: 2,
+        flags: ["Alla", "Lavar", "Signalart", "Lövträd", "Fuktig skog"],
+        habitat: "Stammar av äldre lövträd och ibland klippor i fuktiga, halvöppna miljöer",
+        distribution: "Lunglav förekommer från Skåne till nordligaste Sverige, men ojämnt fördelat. Den har flest lokaler i nederbördsrika västra och sydvästra Sverige samt i Norrlands kust- och inland. Arten är i dag sparsam i landskapet och starkt knuten till gamla, ej slutavverkade skogar.",
+        description: "Lunglav är en stor, karaktäristisk bladlav med djupt inskurna lober och ett nätlikt mönster av åsar och gropar på bålytan. Den är rent grön i väta men blir brun till gråbrun i torrt tillstånd.",
+        ecology: "Arten växer främst på äldre lövträd i miljöer med hög och jämn luftfuktighet. I södra och mellersta Sverige finns den ofta på ädellövträd och asp, medan den längre norrut även växer på sälg, asp, rönn och klippor. Den gynnas av gamla lövträd, sena successioner efter brand och fuktiga skogsmiljöer.",
+        lookFor: ["Stor bladlav med djupt inskurna lober", "Grön i väta, brun eller gråbrun i torka", "Nätlikt mönster av åsar och gropar", "Växer ofta på äldre lövträd i fuktiga miljöer"],
+        viewerUrl: "https://superspl.at/s?id=212eb1fd",
+        localImage: "./assets/Pul_lob.png",
+        accent: "green",
+        illustrationClass: "lunglav"
+      }
+    ];
+
+    const selectedFlags = new Set(["Alla"]);
+    let selectedSignalLevel = null;
+    const allFlags = ["Alla", "Växter", "Svampar", "Lavar", "Orkidéer", "Fridlyst", "Signalart", "Tall", "Vedlevande", "Lövträd", "Fuktig skog"];
+    const photoCache = new Map();
+
+    console.assert(species.length >= 2, "Minst två arter ska finnas.");
+    console.assert(species.every(item => item.viewerUrl && item.latin && item.signalLevel), "Alla arter ska ha viewerUrl, latin och signalLevel.");
+
+    function escapeHtml(value) {
+      return String(value).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;");
+    }
+
+    function renderFilters() {
+      document.getElementById("filters").innerHTML = allFlags.map(flag => `
+        <button type="button" class="filter-chip ${selectedFlags.has(flag) ? "active" : ""}" onclick="toggleFlag('${escapeHtml(flag)}')">${escapeHtml(flag)}</button>
+      `).join("");
+      document.getElementById("clear-filters").hidden = selectedFlags.size === 0 || (selectedFlags.size === 1 && selectedFlags.has("Alla"));
+    }
+
+    function toggleFlag(flag) {
+      if (flag === "Alla") {
+        selectedFlags.clear(); selectedFlags.add("Alla");
+      } else {
+        selectedFlags.delete("Alla");
+        selectedFlags.has(flag) ? selectedFlags.delete(flag) : selectedFlags.add(flag);
+        if (selectedFlags.size === 0) selectedFlags.add("Alla");
+      }
+      renderFilters(); renderGallery();
+    }
+
+    function clearFilters() {
+      selectedFlags.clear();
+      selectedFlags.add("Alla");
+      selectedSignalLevel = null;
+      renderFilters();
+      renderSignalFilter();
+      renderGallery();
+    }
+
+    function setSignalFilter(level) {
+      selectedSignalLevel = level;
+      renderSignalFilter();
+      renderGallery();
+    }
+
+    function renderSignalFilter() {
+      document.querySelectorAll("[data-signal-filter]").forEach((button) => {
+        button.classList.toggle("active", Number(button.dataset.signalFilter) === selectedSignalLevel);
+      });
+      const reset = document.getElementById("signal-reset");
+      if (reset) reset.classList.toggle("active", selectedSignalLevel === null);
+    }
+
+    function matches(item, query) {
+      const text = `${item.name} ${item.latin} ${item.group} ${item.subgroup} ${item.status} ${item.flags.join(" ")}`.toLowerCase();
+      const activeFlags = [...selectedFlags].filter(flag => flag !== "Alla");
+      return (!query || text.includes(query)) &&
+        (activeFlags.length === 0 || activeFlags.every(flag => item.flags.includes(flag))) &&
+        (selectedSignalLevel === null || item.signalLevel === selectedSignalLevel);
+    }
+
+    function renderGallery() {
+      const query = document.getElementById("search").value.trim().toLowerCase();
+      const filtered = species.filter(item => matches(item, query));
+      document.getElementById("count").textContent = `${filtered.length} av ${species.length} arter visas`;
+      document.getElementById("empty").hidden = filtered.length !== 0;
+      document.getElementById("gallery").innerHTML = filtered.map(item => `
+        <button class="card" type="button" onclick="showSpecies('${item.id}')">
+          ${galleryPreviewHtml(item)}
+          <div class="card-body">
+            <h3>${escapeHtml(item.name)}</h3>
+            <p class="latin">${escapeHtml(item.latin)}</p>
+            <div class="tag-row">
+              <span class="tag ${item.accent}">${escapeHtml(item.subgroup)}</span>
+              <span class="tag">${escapeHtml(item.status.split(" i ")[0])}</span>
+              <span class="open-arrow">→</span>
+            </div>
+          </div>
+        </button>
+      `).join("");
+      loadGalleryPhotos(filtered);
+    }
+
+    function galleryPreviewHtml(item) {
+      if (item.localImage) {
+        return `<div class="taxon-thumb loaded"><img src="${escapeHtml(item.localImage)}" alt="${escapeHtml(item.name)}" loading="lazy" style="display:block;" /></div>`;
+      }
+      return `<div class="taxon-thumb" data-photo-for="${escapeHtml(item.id)}"><img alt="${escapeHtml(item.name)}" loading="lazy" /><div class="fallback-illustration">${illustrationHtml(item)}</div></div>`;
+    }
+
+    async function fetchINaturalistPhotos(item, count = 5) {
+      const cacheKey = `${item.latin}:${count}`;
+      if (photoCache.has(cacheKey)) return photoCache.get(cacheKey);
+
+      const url = `https://api.inaturalist.org/v1/observations?taxon_name=${encodeURIComponent(item.latin)}&photos=true&quality_grade=research&per_page=${Math.max(count, 8)}&order_by=votes`;
+      try {
+        const response = await fetch(url, { cache: "no-store" });
+        if (!response.ok) throw new Error(response.status);
+        const data = await response.json();
+        const observations = Array.isArray(data.results) ? data.results : [];
+        const urls = [];
+
+        for (const obs of observations) {
+          const photos = Array.isArray(obs.photos) ? obs.photos : [];
+          for (const photo of photos) {
+            let photoUrl = photo.url || photo.medium_url || photo.square_url;
+            if (!photoUrl) continue;
+            photoUrl = photoUrl.replace("square.", "medium.").replace("small.", "medium.");
+            urls.push(photoUrl);
+            if (urls.length >= count) break;
+          }
+          if (urls.length >= count) break;
+        }
+
+        photoCache.set(cacheKey, urls);
+        return urls;
+      } catch (error) {
+        console.warn("Kunde inte hämta artbilder från iNaturalist", item.latin, error);
+        photoCache.set(cacheKey, []);
+        return [];
+      }
+    }
+
+    async function loadGalleryPhotos(items) {
+      for (const item of items) {
+        if (item.localImage) continue;
+        const thumb = document.querySelector(`[data-photo-for="${CSS.escape(item.id)}"]`);
+        if (!thumb || thumb.classList.contains("loaded")) continue;
+        const img = thumb.querySelector("img");
+        const photos = await fetchINaturalistPhotos(item, 1);
+        if (!photos[0] || !img) continue;
+        img.src = photos[0];
+        img.onload = () => thumb.classList.add("loaded");
+      }
+    }
+
+    function illustrationHtml(item) {
+      const symbolClass = item.id === "guckusko" ? "guckusko-symbol" : "tallticka-symbol";
+      return `<div class="illustration ${item.illustrationClass}"><div class="${symbolClass}"></div></div>`;
+    }
+
+    function showSpecies(id) {
+      const item = species.find(entry => entry.id === id);
+      if (!item) return;
+      document.getElementById("gallery-page").style.display = "none";
+      const page = document.getElementById("species-page");
+      page.style.display = "block";
+      page.innerHTML = speciesPageHtml(item);
+      window.scrollTo({ top: 0, behavior: "instant" });
+      history.replaceState(null, "", `#${item.id}`);
+      loadSpeciesPhotos(item);
+    }
+
+    function showGallery() {
+      document.getElementById("gallery-page").style.display = "block";
+      const page = document.getElementById("species-page");
+      page.style.display = "none";
+      page.innerHTML = "";
+      history.replaceState(null, "", location.pathname);
+      window.scrollTo({ top: 0, behavior: "instant" });
+    }
+
+    function pyramidHtml(item) {
+      return `<div class="pyramid-box"><div class="pyramid">
+        <div class="pyramid-part top ${item.signalLevel === 3 ? "active" : ""}"></div>
+        <div class="pyramid-part mid ${item.signalLevel === 2 ? "active" : ""}"></div>
+        <div class="pyramid-part base ${item.signalLevel === 1 ? "active" : ""}"></div>
+      </div><div class="pyramid-note">Utifrån Nitare, 2020.</div></div>`;
+    }
+
+    function speciesPageHtml(item) {
+      return `<div class="species-shell"><div class="species-layout">
+        <aside>
+          <button class="back-btn" type="button" onclick="showGallery()">← Tillbaka till galleri</button>
+          <h1 class="species-title">${escapeHtml(item.name)}</h1>
+          <p class="species-latin">${escapeHtml(item.latin)}</p>
+          <div class="species-tags"><span class="tag ${item.accent}">${escapeHtml(item.subgroup)}</span><span class="tag">${escapeHtml(item.status.split(" i ")[0])}</span><span class="tag">${escapeHtml(item.group)}</span></div>
+          <p class="species-desc">${escapeHtml(item.description)} ${escapeHtml(item.ecology)}</p>
+          <div class="facts">
+            <div class="fact"><span class="fact-icon">♧</span><div><strong>Grupp</strong>${escapeHtml(item.group)}</div></div>
+            <div class="fact"><span class="fact-icon">✽</span><div><strong>Familj</strong>${escapeHtml(item.family)}</div></div>
+            <div class="fact"><span class="fact-icon">☼</span><div><strong>Blomningstid</strong>${escapeHtml(item.flowering)}</div></div>
+            <div class="fact"><span class="fact-icon">♧</span><div><strong>Livsmiljö</strong>${escapeHtml(item.habitat)}</div></div>
+            <div class="fact"><span class="fact-icon">↓</span><div><strong>Status</strong>${escapeHtml(item.status)}</div></div>
+          </div>
+        </aside>
+        <main>
+          <div class="visual-card splat-wrap"><iframe title="Interaktiv 3D-modell av ${escapeHtml(item.name)}" allow="fullscreen; xr-spatial-tracking" src="${escapeHtml(item.viewerUrl)}"></iframe></div>
+        </main>
+        <aside class="right-col">
+          <div class="mini-thumb" data-mini-photo="0"><img alt="${escapeHtml(item.name)} bild 1" />${illustrationHtml(item)}</div>
+          <div class="mini-thumb" data-mini-photo="1"><img alt="${escapeHtml(item.name)} bild 2" />${illustrationHtml(item)}</div>
+          <div class="mini-thumb" data-mini-photo="2"><img alt="${escapeHtml(item.name)} bild 3" />${illustrationHtml(item)}</div>
+          ${pyramidHtml(item)}
+        </aside>
+        <section class="species-bottom">
+          <article class="white-card"><div class="card-title">Utbredning</div><p>${escapeHtml(item.distribution)}</p><div class="map-placeholder">Här kan en fyndkarta eller Artportalen/GBIF-modul kopplas in senare.</div></article>
+          <article class="white-card"><div class="card-title">Kännetecken</div><ul class="look-list">${item.lookFor.map(point => `<li><span class="dot ${item.accent === "yellow" ? "yellow" : ""}"></span>${escapeHtml(point)}</li>`).join("")}</ul></article>
+        </section>
+      </div></div>`;
+    }
+
+    async function loadSpeciesPhotos(item) {
+      const photos = await fetchINaturalistPhotos(item, 3);
+
+      document.querySelectorAll("[data-mini-photo]").forEach((thumb, index) => {
+        const img = thumb.querySelector("img");
+        if (!img) return;
+
+        const photoUrl = photos[index] || item.localImage;
+        if (!photoUrl) return;
+
+        img.src = photoUrl;
+        img.onload = () => thumb.classList.add("loaded");
+      });
+    }
+
+    renderFilters();
+    renderSignalFilter();
+    renderGallery();
+    const initialId = location.hash.replace("#", "");
+    if (species.some(item => item.id === initialId)) showSpecies(initialId);
+  </script>
 </body>
 </html>
