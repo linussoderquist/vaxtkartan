@@ -61,7 +61,33 @@ const species = [
     localImage: "./assets/Pul_lob.png",
     accent: "green",
     illustrationClass: "lunglav"
-  }
+  },
+  {
+  id: "tibast",
+  name: "Tibast",
+  latin: "Daphne mexereum",
+  group: "Växter", // eller "Svampar"
+  subgroup: "Kärlväxt", // t.ex. "Ticka", "Kärlväxt", "Mossa"
+  family: "Thymelaeaceae",
+  flowering: "april", // eller annan säsongsinfo
+  status: "Signalart",
+  signalLevel: 3, // 1 = lägst, 2 = mellan, 3 = högst
+  flags: ["Växter", "Signalart", "Blomväxt"],
+  habitat: "Mullrika, friska till fuktiga skogar, särskilt lundar, kalkbarrskogar, lövträdslundar, bäckraviner och sluttningar. Gillar ofta kalkrik mark.",
+  distribution: "Finns spridd i stora delar av Sverige men är inte vanlig. Mest typisk i kalkrika trakter, bland annat i södra Sverige, Uppland och Jämtlands kambrosilurområden.",
+  description: "Tibast är en liten, vacker men mycket giftig buske som blommar tidigt på våren med rosa, väldoftande blommor direkt på bar kvist. Senare får den klarröda bär som är lockande men farliga.",
+  ecology: "Arten är en signal om rikare skogsmiljöer, särskilt där marken är kalkpåverkad och fuktig. Blommorna är viktiga för tidiga pollinatörer, medan frukterna sprids av fåglar.",
+  lookFor: [
+    "Rosa/lila blommor på bar kvist tidigt på våren.",
+    "Smal, låg buske med upprätta grenar.",
+    "Bladen sitter samlade mot skottspetsarna.",
+    "Klarröda bär på sommaren/hösten – mycket giftiga."
+  ],
+  viewerUrl: "https://superspl.at/s?id=26d31db2",
+  localImage: "assets/Dap_mez.png", // valfritt. Om den saknas används iNaturalist/fallback
+  accent: "green", // eller "yellow"
+  illustrationClass: "guckusko" // fallback-stil: "guckusko", "tallticka" eller annan du byggt
+},
 ];
 
 const selectedFlags = new Set(["Alla"]);
