@@ -187,35 +187,42 @@ function galleryPreviewHtml(item) {
   return `<div class="taxon-thumb" data-photo-for="${escapeHtml(item.id)}"><img alt="${escapeHtml(item.name)}" loading="lazy" /><div class="fallback-illustration">${illustrationHtml(item)}</div></div>`;
 }
 
-async function fetchINaturalistPhotos(item, count = 5) {
-  const cacheKey = `${item.latin}:${count}`;
-  if (photoCache.has(cacheKey)) return photoCache.get(cacheKey);
+async function fetchINatPhotos(item, limit = 3) {
+  const cacheKey = `inat-photos:${item.latin}:${limit}`;
+  const cached = localStorage.getItem(cacheKey);
+  if (cached) return JSON.parse(cached);
 
-  const url = `https://api.inaturalist.org/v1/observations?taxon_name=${encodeURIComponent(item.latin)}&photos=true&quality_grade=research&per_page=${Math.max(count, 8)}&order_by=votes`;
+  const endpoint =
+    `https://api.inaturalist.org/v1/observations?taxon_name=${encodeURIComponent(item.latin)}&photos=true&quality_grade=research&per_page=30`;
+
   try {
-    const response = await fetch(url, { cache: "no-store" });
-    if (!response.ok) throw new Error(response.status);
-    const data = await response.json();
-    const observations = Array.isArray(data.results) ? data.results : [];
-    const urls = [];
+    const response = await fetch(endpoint);
+    if (!response.ok) throw new Error(`iNaturalist svarade ${response.status}`);
 
-    for (const obs of observations) {
-      const photos = Array.isArray(obs.photos) ? obs.photos : [];
-      for (const photo of photos) {
-        let photoUrl = photo.url || photo.medium_url || photo.square_url;
-        if (!photoUrl) continue;
-        photoUrl = photoUrl.replace("square.", "medium.").replace("small.", "medium.");
-        urls.push(photoUrl);
-        if (urls.length >= count) break;
+    const data = await response.json();
+    const photos = [];
+
+    for (const obs of data.results || []) {
+      for (const photo of obs.photos || []) {
+        const url =
+          photo.url ||
+          photo.medium_url ||
+          photo.square_url;
+
+        if (!url) continue;
+
+        const betterUrl = url.replace("square", "medium");
+        if (!photos.includes(betterUrl)) photos.push(betterUrl);
+
+        if (photos.length >= limit) break;
       }
-      if (urls.length >= count) break;
+      if (photos.length >= limit) break;
     }
 
-    photoCache.set(cacheKey, urls);
-    return urls;
+    localStorage.setItem(cacheKey, JSON.stringify(photos));
+    return photos;
   } catch (error) {
-    console.warn("Kunde inte hämta artbilder från iNaturalist", item.latin, error);
-    photoCache.set(cacheKey, []);
+    console.warn("Kunde inte hämta observationsbilder från iNaturalist", item.latin, error);
     return [];
   }
 }
