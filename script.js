@@ -53,7 +53,7 @@ const species = [
     illustrationClass: "tallticka"
   },
  {
-    id: "tallticka",
+    id: "doftticka",
     name: "Doftticka",
     latin: "Haploporus odorus",
     group: "Svampar",
