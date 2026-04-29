@@ -149,6 +149,7 @@ h1 {
   margin: 16px 0 0 auto;
   display: block;
 }
+
 .landing-value-filter {
   display: flex;
   align-items: center;
@@ -213,17 +214,24 @@ h1 {
   background: rgba(255,255,255,.94);
   color: #13231b;
 }
+
 .gallery-count { margin: 34px 0 18px; color: rgba(255,255,255,.72); }
+
 .gallery {
   display: grid;
-  grid-template-columns: repeat(5, minmax(170px, 1fr));
+  grid-template-columns: repeat(4, minmax(210px, 1fr));
   gap: 18px;
+  align-items: stretch;
 }
+
 .card {
+  height: 424px;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
   border: 1px solid rgba(255,255,255,.28);
   border-radius: 16px;
-  background: rgba(17,32,24,.64);
+  background: rgba(17,32,24,.72);
   color: white;
   padding: 0;
   text-align: left;
@@ -231,9 +239,16 @@ h1 {
   backdrop-filter: blur(18px);
   transition: .18s ease;
 }
-.card:hover { transform: translateY(-5px); background: rgba(22,41,30,.74); }
+.card:hover {
+  transform: translateY(-5px);
+  background: rgba(22,41,30,.78);
+  border-color: rgba(255,255,255,.42);
+}
+
 .taxon-thumb {
+  width: 100%;
   height: 250px;
+  flex: 0 0 250px;
   overflow: hidden;
   background: linear-gradient(135deg, #1c2f23, #0d1912);
   position: relative;
@@ -250,30 +265,51 @@ h1 {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: center;
   filter: saturate(.88) contrast(1.04) brightness(.88);
 }
 .taxon-thumb.loaded img { display: block; }
 .taxon-thumb.loaded .fallback-illustration { display: none; }
 .fallback-illustration { position: absolute; inset: 0; }
+
 .card-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 174px;
   padding: 18px;
   background: linear-gradient(180deg, rgba(17,31,23,.78), rgba(10,21,15,.93));
 }
 .card h3 {
   margin: 0;
+  min-height: 1.72em;
   font-family: Georgia, "Times New Roman", serif;
   font-size: 1.55rem;
   font-weight: 560;
+  line-height: 1.06;
   letter-spacing: -.035em;
   color: #fffaf0;
 }
-.latin { margin: 5px 0 0; font-style: italic; color: rgba(255,255,255,.75); }
-.tag-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 14px; }
+.latin {
+  min-height: 1.35em;
+  margin: 5px 0 0;
+  font-style: italic;
+  color: rgba(255,255,255,.75);
+}
+.tag-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-top: auto;
+  padding-top: 14px;
+}
 .tag {
   border-radius: 999px;
   padding: 7px 11px;
   font-size: .78rem;
   font-weight: 760;
+  line-height: 1;
   color: rgba(255,255,255,.92);
   background: rgba(255,255,255,.16);
   border: 1px solid rgba(255,255,255,.10);
@@ -284,11 +320,13 @@ h1 {
   margin-left: auto;
   width: 28px;
   height: 28px;
+  flex: 0 0 28px;
   display: grid;
   place-items: center;
   border-radius: 50%;
   background: rgba(255,255,255,.14);
 }
+
 .empty {
   border: 1px solid rgba(255,255,255,.22);
   border-radius: 18px;
@@ -305,7 +343,17 @@ h1 {
 }
 .illustration.large { height: 100%; }
 .illustration.tallticka { background: linear-gradient(135deg, #2f3d33, #111d16); }
-.guckusko-symbol, .tallticka-symbol { position: absolute; inset: 0; display: grid; place-items: center; }
+.illustration.lunglav { background: linear-gradient(135deg, #324236, #101b14); }
+
+.guckusko-symbol,
+.tallticka-symbol,
+.lunglav-symbol {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+}
+
 .guckusko-symbol::before {
   content: "";
   width: 148px;
@@ -318,6 +366,7 @@ h1 {
     linear-gradient(90deg, transparent 48%, rgba(78,151,108,.75) 49% 52%, transparent 53%);
   filter: drop-shadow(0 18px 18px rgba(0,0,0,.18));
 }
+
 .tallticka-symbol::before {
   content: "";
   width: 160px;
@@ -326,6 +375,20 @@ h1 {
     radial-gradient(ellipse at 43% 45%, rgba(91,88,82,.95) 0 24%, transparent 25%),
     radial-gradient(ellipse at 44% 56%, rgba(50,47,43,.88) 0 17%, transparent 18%),
     linear-gradient(90deg, transparent 50%, rgba(110,120,100,.54) 51% 70%, transparent 71%);
+  filter: drop-shadow(0 18px 18px rgba(0,0,0,.20));
+}
+
+.lunglav-symbol::before {
+  content: "";
+  width: 150px;
+  height: 150px;
+  border-radius: 55% 45% 48% 52%;
+  background:
+    radial-gradient(circle at 30% 36%, rgba(185,205,183,.90) 0 9%, transparent 10%),
+    radial-gradient(circle at 55% 42%, rgba(150,175,150,.80) 0 12%, transparent 13%),
+    radial-gradient(circle at 44% 68%, rgba(118,145,122,.76) 0 13%, transparent 14%),
+    radial-gradient(circle at 68% 64%, rgba(198,212,192,.82) 0 8%, transparent 9%),
+    radial-gradient(circle at 50% 50%, rgba(80,105,82,.80) 0 45%, transparent 46%);
   filter: drop-shadow(0 18px 18px rgba(0,0,0,.20));
 }
 
@@ -400,6 +463,7 @@ h1 {
 }
 .splat-wrap { position: relative; }
 .splat-wrap iframe { display: block; width: 100%; height: 620px; border: 0; }
+
 .right-col { display: grid; gap: 14px; }
 .mini-thumb {
   height: 156px;
@@ -410,9 +474,16 @@ h1 {
   position: relative;
   box-shadow: 0 14px 36px rgba(0,0,0,.18);
 }
-.mini-thumb img { width: 100%; height: 100%; object-fit: cover; display: none; filter: saturate(.88) brightness(.90); }
+.mini-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: none;
+  filter: saturate(.88) brightness(.90);
+}
 .mini-thumb.loaded img { display: block; }
 .mini-thumb.loaded .illustration { display: none; }
+
 .pyramid-box {
   min-height: 330px;
   display: grid;
@@ -429,6 +500,7 @@ h1 {
 .pyramid-part.base { width: 252px; clip-path: polygon(17% 0, 83% 0, 100% 100%, 0 100%); background: #aeb8aa; }
 .pyramid-part.active { opacity: 1; background: #123f31; filter: drop-shadow(0 14px 24px rgba(18,63,49,.24)); transform: scale(1.035); }
 .pyramid-note { margin-top: 16px; text-align: center; color: #6b746d; font-size: .88rem; }
+
 .species-bottom {
   grid-column: 2 / 4;
   display: grid;
@@ -489,4 +561,385 @@ h1 {
   .filter-chip { white-space: nowrap; }
   .right-col { grid-template-columns: 1fr; }
   .splat-wrap iframe { height: 460px; }
+}
+
+@media (max-width: 900px) {
+  .wrap {
+    width: min(100% - 28px, 1220px);
+  }
+
+  .topbar {
+    padding: 22px 0 18px;
+    align-items: flex-start;
+  }
+
+  .brand-mark {
+    width: 42px;
+    height: 42px;
+    font-size: 1rem;
+  }
+
+  .brand-title {
+    font-size: 1rem;
+  }
+
+  .brand-sub {
+    font-size: 0.82rem;
+  }
+
+  .nav {
+    display: none;
+  }
+
+  .gallery-hero {
+    padding: 36px 0 46px;
+  }
+
+  h1 {
+    font-size: clamp(3rem, 18vw, 4.2rem);
+    letter-spacing: -0.06em;
+  }
+
+  .search-row {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  .search-input {
+    padding: 15px 16px 15px 48px;
+    font-size: 0.95rem;
+  }
+
+  .filters {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 10px;
+    padding: 2px 0 8px;
+    scrollbar-width: none;
+  }
+
+  .filters::-webkit-scrollbar {
+    display: none;
+  }
+
+  .filter-chip {
+    flex: 0 0 auto;
+    white-space: nowrap;
+    padding: 10px 16px;
+    font-size: 0.9rem;
+  }
+
+  .landing-value-filter {
+    align-items: flex-start;
+    gap: 12px;
+    overflow-x: auto;
+    padding-bottom: 6px;
+  }
+
+  .landing-value-filter-label {
+    padding-top: 11px;
+  }
+
+  .gallery-count {
+    margin: 26px 0 14px;
+  }
+
+  .gallery {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+  }
+
+  .card {
+    height: 355px;
+    border-radius: 15px;
+  }
+
+  .taxon-thumb {
+    height: 205px;
+    flex-basis: 205px;
+  }
+
+  .card-body {
+    min-height: 150px;
+    padding: 14px;
+  }
+
+  .card h3 {
+    font-size: 1.32rem;
+  }
+
+  .latin {
+    font-size: 0.9rem;
+  }
+
+  .tag-row {
+    gap: 6px;
+    padding-top: 10px;
+  }
+
+  .tag {
+    padding: 6px 9px;
+    font-size: 0.72rem;
+  }
+
+  .open-arrow {
+    width: 27px;
+    height: 27px;
+    flex-basis: 27px;
+  }
+}
+
+
+@media (max-width: 620px) {
+  body {
+    background: #07120d;
+  }
+
+  .site-bg {
+    background:
+      linear-gradient(180deg, rgba(6,16,11,.20), rgba(6,16,11,.92) 70%),
+      radial-gradient(circle at 45% 0%, rgba(236,245,232,.18), transparent 32%),
+      url("assets/scandinavian-wet-forest.jpg") center top / cover fixed no-repeat,
+      #07120d;
+  }
+
+  .wrap {
+    width: min(100% - 24px, 1220px);
+  }
+
+  .topbar {
+    gap: 12px;
+  }
+
+  .brand {
+    gap: 11px;
+  }
+
+  .gallery-hero {
+    padding-top: 30px;
+  }
+
+  h1 {
+    font-size: clamp(2.8rem, 20vw, 3.8rem);
+  }
+
+  .search-row {
+    margin-top: 20px;
+  }
+
+  .search-wrap {
+    width: 100%;
+  }
+
+  .search-input {
+    border-radius: 18px;
+  }
+
+  .landing-value-filter {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    width: 100%;
+  }
+
+  .mini-pyramid-filter {
+    justify-self: start;
+  }
+
+  .clear-btn {
+    margin-left: 0;
+  }
+
+  .gallery {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  .card {
+    height: auto;
+    min-height: 0;
+  }
+
+  .taxon-thumb {
+    height: 260px;
+    flex-basis: 260px;
+  }
+
+  .card-body {
+    min-height: 145px;
+  }
+
+  .card h3 {
+    font-size: 1.62rem;
+  }
+
+  .latin {
+    font-size: 1rem;
+  }
+
+  .tag {
+    font-size: 0.78rem;
+  }
+
+  /* Artsida mobil */
+  .species-shell {
+    padding: 22px 0 34px;
+    background:
+      linear-gradient(180deg, rgba(7,18,13,.86), rgba(7,18,13,.96)),
+      url("assets/scandinavian-wet-forest.jpg") center top / cover fixed no-repeat,
+      #07120d;
+  }
+
+  .species-layout {
+    width: min(100% - 24px, 780px);
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .back-btn {
+    margin-bottom: 28px;
+    font-size: 0.95rem;
+  }
+
+  .species-title {
+    font-size: clamp(3rem, 17vw, 4rem);
+  }
+
+  .species-latin {
+    font-size: 1.08rem;
+  }
+
+  .species-tags {
+    margin: 18px 0 22px;
+  }
+
+  .species-desc {
+    font-size: 0.96rem;
+    line-height: 1.65;
+  }
+
+  .facts {
+    margin-top: 28px;
+    gap: 17px;
+  }
+
+  .visual-card {
+    border-radius: 15px;
+  }
+
+  .splat-wrap iframe {
+    height: 68vh;
+    min-height: 430px;
+    max-height: 620px;
+  }
+
+  .right-col {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .mini-thumb {
+    height: 180px;
+  }
+
+  .pyramid-box {
+    min-height: 280px;
+    padding: 30px 18px 20px;
+  }
+
+  .pyramid-part {
+    height: 56px;
+  }
+
+  .pyramid-part.top {
+    width: 74px;
+  }
+
+  .pyramid-part.mid {
+    width: 148px;
+  }
+
+  .pyramid-part.base {
+    width: 222px;
+  }
+
+  .species-bottom {
+    grid-column: auto;
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .white-card {
+    padding: 18px;
+  }
+
+  .map-placeholder {
+    height: 150px;
+  }
+
+  #om-projektet {
+    padding: 34px 0 48px;
+  }
+
+  #om-projektet h2 {
+    font-size: 2rem;
+  }
+}
+
+
+@media (max-width: 390px) {
+  .wrap {
+    width: min(100% - 18px, 1220px);
+  }
+
+  .brand-sub {
+    display: none;
+  }
+
+  h1 {
+    font-size: 2.65rem;
+  }
+
+  .taxon-thumb {
+    height: 230px;
+    flex-basis: 230px;
+  }
+
+  .card-body {
+    padding: 13px;
+  }
+
+  .tag-row {
+    gap: 5px;
+  }
+
+  .tag {
+    padding: 6px 8px;
+  }
+
+  .species-layout {
+    width: min(100% - 18px, 780px);
+  }
+
+  .splat-wrap iframe {
+    min-height: 390px;
+    height: 62vh;
+  }
+
+  .mini-thumb {
+    height: 155px;
+  }
+
+  .pyramid-part.top {
+    width: 64px;
+  }
+
+  .pyramid-part.mid {
+    width: 128px;
+  }
+
+  .pyramid-part.base {
+    width: 194px;
+  }
 }
