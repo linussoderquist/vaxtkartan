@@ -24,7 +24,7 @@ button { cursor: pointer; }
 .site-bg {
   min-height: 100vh;
   background:
-    linear-gradient(180deg, rgba(6,16,11,.12), rgba(6,16,11,.86) 72%),
+    linear-gradient(180deg, rgba(5, 64, 21,.12), rgba(6,16,11,.86) 72%),
     radial-gradient(circle at 35% 3%, rgba(236,245,232,.28), transparent 28%),
     radial-gradient(circle at 80% 24%, rgba(110,140,104,.20), transparent 32%),
     url("assets/scandinavian-wet-forest.jpg") center top / cover fixed no-repeat,
