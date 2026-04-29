@@ -89,7 +89,7 @@ const species = [
     family: "Thymelaeaceae",
     flowering: "April – maj",
     status: "Signalart",
-    signalLevel: 3,
+    signalLevel: 1,
     flags: ["Alla", "Växter", "Kärlväxter", "Signalart", "Blomväxt", "Fuktig skog"],
     habitat: "Mullrika, friska till fuktiga skogar, särskilt lundar, kalkbarrskogar, lövträdslundar, bäckraviner och sluttningar. Gillar ofta kalkrik mark.",
     distribution: "Finns spridd i stora delar av Sverige men är inte vanlig. Mest typisk i kalkrika trakter, bland annat i södra Sverige, Uppland och Jämtlands kambrosilurområden.",
