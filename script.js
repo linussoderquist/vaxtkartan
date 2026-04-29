@@ -52,6 +52,32 @@ const species = [
     accent: "green",
     illustrationClass: "tallticka"
   },
+ {
+    id: "tallticka",
+    name: "Doftticka",
+    latin: "Haploporus odorus",
+    group: "Svampar",
+    subgroup: "Ticka",
+    family: "Polyporaceae",
+    flowering: "Flerårig fruktkropp",
+    status: "Signalart",
+    signalLevel: 3,
+    flags: ["Alla", "Svampar", "Signalart", "Sälg", "Vedlevande", "Gammelskog"],
+    habitat: "Gamla sälgar",
+    distribution: "",
+    description: "",
+    ecology: "",
+    lookFor: [
+      "Doftar",
+      "Växer på sälg",
+      "Ofta högt upp på stammen",
+      "Kopplad till gamla sälgar"
+    ],
+    viewerUrl: "https://superspl.at/s?id=c63007b2",
+    localImage: "./assets/Hap_odo.png",
+    accent: "green",
+    illustrationClass: "tallticka"
+  },
 
   {
     id: "lunglav",
